@@ -526,6 +526,29 @@
         .payment-error {
             display: block;
         }
+
+        /* Estilos para parcelamento */
+        #parcelas-select {
+            background-color: white;
+            cursor: pointer;
+        }
+
+        #parcelas-select:focus {
+            outline: none;
+            border-color: var(--cor-ouro-acento);
+            box-shadow: 0 0 0 2px rgba(165, 138, 92, 0.2);
+        }
+
+        .parcela-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .parcela-valor {
+            font-weight: 600;
+            color: var(--cor-marrom-cta);
+        }
     </style>
 </head>
 
@@ -838,9 +861,18 @@
                                 </div>
                                 <div class="flex-1">
                                     <div class="font-semibold">Cartão de Crédito</div>
-                                    <div class="text-sm text-gray-600">Até 12x sem juros (acréscimo de 5.49%)</div>
+                                    <div class="text-sm text-gray-600">Parcelamento com juros</div>
                                 </div>
                             </label>
+                        </div>
+
+                        <!-- Adicionar seletor de parcelas (inicialmente escondido) -->
+                        <div id="parcelamento-container" class="hidden mt-3 p-3 bg-gray-50 rounded-lg border">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Parcelamento:</label>
+                            <select id="parcelas-select" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                <option value="1">1x de R$ 0,00 (à vista)</option>
+                            </select>
+                            <div id="parcela-info" class="text-xs text-gray-600 mt-2"></div>
                         </div>
                         
                         <div class="payment-option">
@@ -955,6 +987,9 @@
         let splideThumbnails = null;
         let homeSplide = null;
 
+        // Configuração de parcelamento
+        const TAXA_JUROS = 0.0549; // 5.49% de taxa
+
         // ELEMENTOS DO DOM
         const elements = {
             cartOverlay: document.getElementById('cart-overlay'),
@@ -977,6 +1012,121 @@
             checkoutSummary: document.getElementById('checkout-summary'),
             checkoutTotal: document.getElementById('checkout-total')
         };
+
+        // ===================================
+        // FUNÇÕES DE PARCELAMENTO
+        // ===================================
+
+        // Função para calcular parcelas
+        function calcularParcelas(valorTotal) {
+            const parcelas = [];
+            
+            // 1x à vista (sem juros)
+            parcelas.push({
+                parcelas: 1,
+                valorParcela: valorTotal,
+                valorTotal: valorTotal,
+                temJuros: false
+            });
+            
+            // 2x a 12x com juros
+            for (let i = 2; i <= 12; i++) {
+                const valorComJuros = valorTotal * (1 + TAXA_JUROS);
+                const valorParcela = valorComJuros / i;
+                
+                parcelas.push({
+                    parcelas: i,
+                    valorParcela: valorParcela,
+                    valorTotal: valorComJuros,
+                    temJuros: true
+                });
+            }
+            
+            return parcelas;
+        }
+
+        // Função para formatar valor em Real
+        function formatarReal(valor) {
+            return 'R$ ' + valor.toFixed(2).replace('.', ',');
+        }
+
+        // Função para mostrar/ocultar seletor de parcelas
+        function toggleParcelamento(mostrar) {
+            const container = document.getElementById('parcelamento-container');
+            const select = document.getElementById('parcelas-select');
+            
+            if (mostrar) {
+                container.classList.remove('hidden');
+                // Calcular e preencher parcelas
+                const subtotal = cart.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
+                preencherOpcoesParcelamento(subtotal);
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // Função para preencher opções de parcelamento
+        function preencherOpcoesParcelamento(valorTotal) {
+            const select = document.getElementById('parcelas-select');
+            const info = document.getElementById('parcela-info');
+            
+            // Limpar opções existentes
+            select.innerHTML = '';
+            
+            const parcelas = calcularParcelas(valorTotal);
+            
+            parcelas.forEach(parcela => {
+                const option = document.createElement('option');
+                option.value = parcela.parcelas;
+                
+                if (parcela.parcelas === 1) {
+                    option.textContent = `1x de ${formatarReal(parcela.valorParcela)} (à vista)`;
+                } else {
+                    const jurosText = parcela.temJuros ? 'com juros' : 'sem juros';
+                    option.textContent = `${parcela.parcelas}x de ${formatarReal(parcela.valorParcela)} ${jurosText}`;
+                }
+                
+                select.appendChild(option);
+            });
+            
+            // Atualizar informações detalhadas
+            atualizarInfoParcelamento(parcelas[0]);
+        }
+
+        // Função para atualizar informações do parcelamento
+        function atualizarInfoParcelamento(parcelaSelecionada) {
+            const info = document.getElementById('parcela-info');
+            
+            if (parcelaSelecionada.parcelas === 1) {
+                info.innerHTML = `
+                    <div class="parcela-line">
+                        <span>Valor à vista:</span>
+                        <span class="parcela-valor">${formatarReal(parcelaSelecionada.valorTotal)}</span>
+                    </div>
+                    <div>Pagamento único sem acréscimos</div>
+                `;
+            } else {
+                const taxaPercentual = (TAXA_JUROS * 100).toFixed(2);
+                info.innerHTML = `
+                    <div class="parcela-line">
+                        <span>Valor total:</span>
+                        <span class="parcela-valor">${formatarReal(parcelaSelecionada.valorTotal)}</span>
+                    </div>
+                    <div class="parcela-line">
+                        <span>Valor por parcela:</span>
+                        <span class="parcela-valor">${formatarReal(parcelaSelecionada.valorParcela)}</span>
+                    </div>
+                    <div>Taxa de ${taxaPercentual}% aplicada no parcelamento</div>
+                `;
+            }
+        }
+
+        // Função para obter a parcela selecionada
+        function obterParcelaSelecionada(valorTotal) {
+            const select = document.getElementById('parcelas-select');
+            const parcelas = calcularParcelas(valorTotal);
+            return parcelas.find(p => p.parcelas === parseInt(select.value)) || parcelas[0];
+        }
 
         // ===================================
         // FUNÇÕES PRINCIPAIS
@@ -1494,7 +1644,7 @@
                             <h4 class="font-semibold">${item.nome}</h4>
                             <p class="text-sm text-gray-500">Tamanho: ${item.tamanho}</p>
                             ${item.cor ? `<p class="text-sm text-gray-500">Cor: ${item.cor.nome}</p>` : ''}
-                            <p class="text-sm gold-accent serif">R$ ${parseFloat(item.preco).toFixed(2).replace('.',',')}</p>
+                            <p class="text-sm gold-accent serif">${formatarReal(parseFloat(item.preco))}</p>
                             <div class="flex items-center justify-between mt-2">
                                 <div class="flex items-center border rounded">
                                     <button data-id="${item.cartItemId}" class="cart-qty-change px-2 py-1" data-change="-1">−</button>
@@ -1510,7 +1660,7 @@
             }
 
             const subtotal = cart.reduce((total, item) => total + (item.preco * item.quantity), 0);
-            elements.cartSubtotalEl.textContent = `R$ ${subtotal.toFixed(2).replace('.',',')}`;
+            elements.cartSubtotalEl.textContent = formatarReal(subtotal);
 
             const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
             elements.cartCountBadge.textContent = totalItems;
@@ -1541,6 +1691,9 @@
                 return;
             }
 
+            // Resetar parcelamento
+            toggleParcelamento(false);
+            
             updateCheckoutSummary();
             elements.checkoutModal.classList.add('active');
             closeCart();
@@ -1553,18 +1706,20 @@
         // Função para atualizar resumo com base na forma de pagamento
         function updateCheckoutSummary() {
             const formaPagamento = document.querySelector('input[name="pagamento"]:checked');
-            let total = cart.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
+            let subtotal = cart.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
             let taxa = 0;
-            let totalFinal = total;
+            let totalFinal = subtotal;
 
+            // Se for cartão, usar o valor das parcelas
             if (formaPagamento && formaPagamento.value === 'Cartão de Crédito') {
-                taxa = total * 0.0549; // 5.49% de taxa
-                totalFinal = total + taxa;
+                const parcelaSelecionada = obterParcelaSelecionada(subtotal);
+                totalFinal = parcelaSelecionada.valorTotal;
+                taxa = totalFinal - subtotal;
             }
 
             let html = '';
             cart.forEach(item => {
-                const subtotal = item.preco * item.quantity;
+                const itemSubtotal = item.preco * item.quantity;
                 html += `
                     <div class="flex justify-between items-center py-2 border-b">
                         <div class="flex-1">
@@ -1576,7 +1731,7 @@
                             </p>
                         </div>
                         <div class="text-right">
-                            <p class="font-semibold">R$ ${subtotal.toFixed(2).replace('.',',')}</p>
+                            <p class="font-semibold">${formatarReal(itemSubtotal)}</p>
                         </div>
                     </div>
                 `;
@@ -1584,20 +1739,21 @@
             
             // Adicionar linha de taxa se houver
             if (taxa > 0) {
+                const taxaPercentual = (TAXA_JUROS * 100).toFixed(2);
                 html += `
                     <div class="flex justify-between items-center py-2 border-b text-red-600">
                         <div class="flex-1">
-                            <p class="font-medium">Taxa cartão de crédito (5.49%)</p>
+                            <p class="font-medium">Taxa do cartão (${taxaPercentual}%)</p>
                         </div>
                         <div class="text-right">
-                            <p class="font-semibold">+ R$ ${taxa.toFixed(2).replace('.',',')}</p>
+                            <p class="font-semibold">+ ${formatarReal(taxa)}</p>
                         </div>
                     </div>
                 `;
             }
 
             elements.checkoutSummary.innerHTML = html;
-            elements.checkoutTotal.textContent = `R$ ${totalFinal.toFixed(2).replace('.',',')}`;
+            elements.checkoutTotal.textContent = formatarReal(totalFinal);
         }
 
         // Função para validar formulário
@@ -1674,13 +1830,18 @@
                 pagamento: formData.get('pagamento')
             };
 
-            // Calcular total (com taxa para cartão)
-            let total = cart.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
+            // Calcular total
+            let subtotal = cart.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
             let taxa = 0;
-            
+            let total = subtotal;
+            let parcelas = 1;
+
+            // Se for cartão, usar o valor das parcelas
             if (cliente.pagamento === 'Cartão de Crédito') {
-                taxa = total * 0.0549; // 5.49% de taxa
-                total += taxa;
+                const parcelaSelecionada = obterParcelaSelecionada(subtotal);
+                total = parcelaSelecionada.valorTotal;
+                taxa = total - subtotal;
+                parcelas = parcelaSelecionada.parcelas;
             }
 
             try {
@@ -1691,13 +1852,14 @@
                     cliente: cliente,
                     total: total,
                     taxa: taxa,
+                    parcelas: parcelas,
                     formaPagamento: cliente.pagamento,
                     data: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 // Gerar mensagem para WhatsApp (atualizada com forma de pagamento e taxa)
-                const mensagemWhatsApp = gerarMensagemWhatsApp(pedidoRef.id, cart, total, cliente, taxa);
+                const mensagemWhatsApp = gerarMensagemWhatsApp(pedidoRef.id, cart, total, cliente, taxa, parcelas);
                 const urlWhatsApp = `https://wa.me/5527999287657?text=${encodeURIComponent(mensagemWhatsApp)}`;
                 
                 // Limpar carrinho
@@ -1720,7 +1882,7 @@
         }
 
         // Atualizar a função gerarMensagemWhatsApp para incluir forma de pagamento e taxa
-        function gerarMensagemWhatsApp(pedidoId, itens, total, cliente, taxa = 0) {
+        function gerarMensagemWhatsApp(pedidoId, itens, total, cliente, taxa = 0, parcelas = 1) {
             let mensagem = `🛍️ *NOVO PEDIDO - Laméd vs* 🛍️\n\n`;
             mensagem += `*Pedido:* #${pedidoId.substring(0, 8).toUpperCase()}\n\n`;
             
@@ -1740,8 +1902,12 @@
             
             // Forma de pagamento
             mensagem += `*Forma de Pagamento:* ${cliente.pagamento}\n`;
-            if (taxa > 0) {
-                mensagem += `• *Taxa de 5.49% aplicada: R$ ${taxa.toFixed(2).replace('.', ',')}*\n`;
+            if (cliente.pagamento === 'Cartão de Crédito') {
+                mensagem += `• Parcelado em ${parcelas}x\n`;
+                if (taxa > 0) {
+                    const taxaPercentual = (TAXA_JUROS * 100).toFixed(2);
+                    mensagem += `• *Taxa de ${taxaPercentual}%: ${formatarReal(taxa)}*\n`;
+                }
             }
             mensagem += `\n`;
             
@@ -1753,11 +1919,11 @@
                 mensagem += `   • Tamanho: ${item.tamanho}\n`;
                 if (item.cor) mensagem += `   • Cor: ${item.cor.nome}\n`;
                 mensagem += `   • Quantidade: ${item.quantity}\n`;
-                mensagem += `   • Preço: R$ ${subtotal.toFixed(2).replace('.', ',')}\n\n`;
+                mensagem += `   • Preço: ${formatarReal(subtotal)}\n\n`;
             });
             
             // Total
-            mensagem += `*VALOR TOTAL: R$ ${total.toFixed(2).replace('.', ',')}*\n\n`;
+            mensagem += `*VALOR TOTAL: ${formatarReal(total)}*\n\n`;
             
             mensagem += `_Este pedido foi gerado automaticamente através do site._`;
             
@@ -1922,8 +2088,15 @@
             });
 
             // Event listeners para opções de pagamento
-            document.querySelectorAll('.payment-radio').forEach(radio => {
+            document.querySelectorAll('input[name="pagamento"]').forEach(radio => {
                 radio.addEventListener('change', function() {
+                    // Mostrar/ocultar parcelamento baseado na seleção
+                    if (this.value === 'Cartão de Crédito') {
+                        toggleParcelamento(true);
+                    } else {
+                        toggleParcelamento(false);
+                    }
+                    
                     // Atualizar visual da seleção
                     document.querySelectorAll('.payment-label').forEach(label => {
                         label.classList.remove('border-[--cor-ouro-acento]', 'bg-amber-50');
@@ -1937,6 +2110,11 @@
                     // Atualizar resumo com base na forma de pagamento
                     updateCheckoutSummary();
                 });
+            });
+
+            // Event listener para mudança no número de parcelas
+            document.getElementById('parcelas-select').addEventListener('change', function() {
+                updateCheckoutSummary();
             });
 
             elements.cartItemsContainer.addEventListener('click', (e) => {

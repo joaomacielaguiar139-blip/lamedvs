@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Painel Administrativo - Laméd vs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Allura&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cor-fundo: #FFFFFF;
+            --cor-texto: #1F2937;
+            --cor-marrom-cta: #643f21;
+            --cor-ouro-acento: #A58A5C;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--cor-texto);
+            background-color: #f8fafc;
+        }
+
+        .font-allura { font-family: 'Allura', cursive; }
+
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-primary {
+            background-color: var(--cor-marrom-cta);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #5a3d2b;
+            transform: translateY(-1px);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+                        0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f4f6;
+            border-radius: 50%;
+            border-top-color: #a58a5c;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--cor-ouro-acento), #d4af37);
+            height: 6px;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .quick-action {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .quick-action:hover {
+            border-color: var(--cor-ouro-acento);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+<header class="bg-white shadow-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center">
+                <a href="produtos.html" class="font-allura text-4xl text-[--cor-texto]">
+                    Laméd vs
+                </a>
+                <span class="ml-4 text-lg text-gray-500 font-medium">Dashboard</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-6">
+                <a href="produtos.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                    <i class="fa-solid fa-shirt mr-2"></i>Produtos
+                </a>
+                <a href="galeria.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                    <i class="fa-solid fa-images mr-2"></i>Galeria
+                </a>
+                <a href="pedidos.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                    <i class="fa-solid fa-shopping-bag mr-2"></i>Pedidos
+                </a>
+                <a href="colecoes.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                    <i class="fa-solid fa-layer-group mr-2"></i>Coleções
+                </a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <button id="refresh-btn" class="text-gray-600 hover:text-[--cor-marrom-cta]" title="Atualizar">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+                <button id="logout-button" class="text-gray-600 hover:text-gray-900 text-sm" title="Sair">
+                    Sair <i class="fa-solid fa-arrow-right-from-bracket ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-800">Dashboard Geral</h1>
+            <p class="text-gray-600">Visão geral do seu negócio</p>
+        </div>
+
+        <div class="flex gap-4">
+            <select id="time-filter" class="border border-gray-300 rounded-md px-3 py-2 text-sm">
+                <option value="7">Últimos 7 dias</option>
+                <option value="30" selected>Últimos 30 dias</option>
+                <option value="90">Últimos 3 meses</option>
+                <option value="365">Último ano</option>
+            </select>
+            <button id="export-btn" class="btn-primary text-sm px-4 py-2">
+                <i class="fa-solid fa-download mr-2"></i>Exportar
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="card stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Total de Pedidos</p>
+                    <p id="total-pedidos" class="text-3xl font-bold text-[--cor-marrom-cta] mt-2">0</p>
+                </div>
+                <div class="bg-orange-100 p-3 rounded-full">
+                    <i class="fa-solid fa-shopping-bag text-orange-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Este mês</span>
+                    <span id="pedidos-mes">0</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="pedidos-progress" class="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Valor Total</p>
+                    <p id="valor-total" class="text-3xl font-bold text-[--cor-marrom-cta] mt-2">R$ 0,00</p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-full">
+                    <i class="fa-solid fa-money-bill-wave text-green-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Receita mensal</span>
+                    <span id="receita-mes">R$ 0,00</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="receita-progress" class="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Produtos</p>
+                    <p id="total-produtos" class="text-3xl font-bold text-[--cor-marrom-cta] mt-2">0</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fa-solid fa-shirt text-blue-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Na coleção atual</span>
+                    <span id="produtos-ativos">0 ativos</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="produtos-progress" class="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Visitantes</p>
+                    <p id="total-visitantes" class="text-3xl font-bold text-[--cor-marrom-cta] mt-2">0</p>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <i class="fa-solid fa-users text-purple-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Este mês</span>
+                    <span id="visitantes-mes">0</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="visitantes-progress" class="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div class="lg:col-span-2 card">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-800">Últimos Pedidos</h3>
+                <a href="pedidos.html" class="text-sm text-[--cor-marrom-cta] hover:underline">Ver todos</a>
+            </div>
+            <div id="ultimos-pedidos" class="space-y-4">
+                <div class="text-center py-8">
+                    <div class="loading-spinner mx-auto"></div>
+                    <p class="text-gray-500 mt-2">Carregando pedidos...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">Ações Rápidas</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <a href="produtos.html" class="quick-action card text-center p-4 hover:shadow-md">
+                    <i class="fa-solid fa-shirt text-2xl text-[--cor-ouro-acento] mb-2"></i>
+                    <p class="font-medium">Produtos</p>
+                </a>
+                <a href="galeria.html" class="quick-action card text-center p-4 hover:shadow-md">
+                    <i class="fa-solid fa-images text-2xl text-[--cor-ouro-acento] mb-2"></i>
+                    <p class="font-medium">Galeria</p>
+                </a>
+                <a href="colecoes.html" class="quick-action card text-center p-4 hover:shadow-md">
+                    <i class="fa-solid fa-layer-group text-2xl text-[--cor-ouro-acento] mb-2"></i>
+                    <p class="font-medium">Coleções</p>
+                </a>
+                <a href="pedidos.html" class="quick-action card text-center p-4 hover:shadow-md">
+                    <i class="fa-solid fa-shopping-bag text-2xl text-[--cor-ouro-acento] mb-2"></i>
+                    <p class="font-medium">Pedidos</p>
+                </a>
+            </div>
+
+            <div class="mt-8 pt-6 border-t">
+                <h4 class="font-semibold text-gray-700 mb-4">Status da Loja</h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Coleção Ativa</span>
+                        <span id="colecao-ativa" class="text-sm font-medium bg-green-100 text-green-800 px-2 py-1 rounded">Carregando...</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Pedidos Pendentes</span>
+                        <span id="pedidos-pendentes" class="text-sm font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Imagens na Galeria</span>
+                        <span id="total-imagens" class="text-sm font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="card">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">Produtos Mais Vendidos</h3>
+            <div id="produtos-mais-vendidos">
+                <div class="text-center py-8">
+                    <div class="loading-spinner mx-auto"></div>
+                    <p class="text-gray-500 mt-2">Carregando dados...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">Estatísticas de Acesso</h3>
+            <div id="estatisticas-acesso" class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Visitas Hoje</span>
+                    <span id="visitas-hoje" class="font-medium">0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Taxa de Conversão</span>
+                    <span id="taxa-conversao" class="font-medium">0%</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Dispositivos Móveis</span>
+                    <span id="dispositivos-moveis" class="font-medium">0%</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Página Mais Visitada</span>
+                    <span id="pagina-mais-visitada" class="font-medium text-sm text-right">-</span>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t">
+                <h4 class="font-semibold text-gray-700 mb-4">Visitas na Semana</h4>
+                <div id="grafico-visitas" class="flex items-end justify-between h-32 gap-1">
+                    <div class="text-center text-xs text-gray-500">Carregando...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="toast" class="hidden fixed bottom-10 right-10 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 z-50">
+    <span id="toast-message">Ação realizada com sucesso!</span>
+</div>
+
+<script type="module">
+    const firebaseConfig = {
+        apiKey: "AIzaSyCzB4_YotWCPVh1yaqWkhbB4LypPQYvV4U",
+        authDomain: "site-lamed.firebaseapp.com",
+        databaseURL: "https://site-lamed-default-rtdb.firebaseio.com",
+        projectId: "site-lamed",
+        storageBucket: "site-lamed.firebasestorage.app",
+        messagingSenderId: "862756160215",
+        appId: "1:862756160215:web:d0fded233682bf93eaa692",
+        measurementId: "G-BL1G961PGT"
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { 
+        getFirestore, collection, onSnapshot, query, where, orderBy, limit, 
+        getCountFromServer, getDocs, Timestamp 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let app, auth, db;
+    try {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+    } catch (error) {
+        console.error("Erro ao inicializar Firebase", error);
+        mostrarToast("Erro de configuração do Firebase", "error");
+    }
+
+    const elementos = {
+        totalPedidos: document.getElementById('total-pedidos'),
+        pedidosMes: document.getElementById('pedidos-mes'),
+        pedidosProgress: document.getElementById('pedidos-progress'),
+        valorTotal: document.getElementById('valor-total'),
+        receitaMes: document.getElementById('receita-mes'),
+        receitaProgress: document.getElementById('receita-progress'),
+        totalProdutos: document.getElementById('total-produtos'),
+        produtosAtivos: document.getElementById('produtos-ativos'),
+        produtosProgress: document.getElementById('produtos-progress'),
+        totalVisitantes: document.getElementById('total-visitantes'),
+        visitantesMes: document.getElementById('visitantes-mes'),
+        visitantesProgress: document.getElementById('visitantes-progress'),
+        ultimosPedidos: document.getElementById('ultimos-pedidos'),
+        produtosMaisVendidos: document.getElementById('produtos-mais-vendidos'),
+        colecaoAtiva: document.getElementById('colecao-ativa'),
+        pedidosPendentes: document.getElementById('pedidos-pendentes'),
+        totalImagens: document.getElementById('total-imagens'),
+        visitasHoje: document.getElementById('visitas-hoje'),
+        taxaConversao: document.getElementById('taxa-conversao'),
+        dispositivosMoveis: document.getElementById('dispositivos-moveis'),
+        paginaMaisVisitada: document.getElementById('pagina-mais-visitada'),
+        graficoVisitas: document.getElementById('grafico-visitas'),
+        timeFilter: document.getElementById('time-filter'),
+        refreshBtn: document.getElementById('refresh-btn'),
+        exportBtn: document.getElementById('export-btn'),
+        logoutButton: document.getElementById('logout-button')
+    };
+
+    let dadosDashboard = {
+        pedidos: [],
+        produtos: [],
+        visitas: [],
+        colecoes: [],
+        estatisticas: {}
+    };
+
+    let periodoSelecionado = 30;
+
+    // CORREÇÃO: Adicionar função mostrarToast
+    function mostrarToast(message, type = "success") {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        
+        toastMessage.textContent = message;
+        toast.className = `fixed bottom-10 right-10 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 z-50 ${
+            type === "error" ? "bg-red-600" : "bg-green-600"
+        } text-white`;
+        toast.classList.remove('hidden');
+        
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3000);
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = './login-admin.html';
+        } else {
+            carregarDashboard();
+        }
+    });
+
+    async function carregarDashboard() {
+        try {
+            await Promise.all([
+                carregarPedidos(),
+                carregarProdutos(),
+                carregarVisitas(),
+                carregarColecoes()
+            ]);
+
+            // CORREÇÃO: Chamar carregarEstatisticas DEPOIS dos dados estarem carregados
+            dadosDashboard.estatisticas = calcularEstatisticas();
+            
+            // CORREÇÃO: Chamar função de estatísticas de acesso
+            await carregarEstatisticasAcesso();
+            
+            atualizarUI();
+            mostrarToast("Dashboard atualizado com sucesso!");
+            
+        } catch (error) {
+            console.error("Erro ao carregar dashboard:", error);
+            mostrarToast("Erro ao carregar dados do dashboard", "error");
+        }
+    }
+
+    async function carregarPedidos() {
+        try {
+            const agora = new Date();
+            const inicioPeriodo = new Date(agora.getTime() - (periodoSelecionado * 24 * 60 * 60 * 1000));
+            
+            const q = query(
+                collection(db, "pedidos"),
+                where("data", ">=", Timestamp.fromDate(inicioPeriodo)),
+                orderBy("data", "desc")
+            );
+
+            const snapshot = await getDocs(q);
+            dadosDashboard.pedidos = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        } catch (error) {
+            console.error("Erro ao carregar pedidos:", error);
+            dadosDashboard.pedidos = [];
+        }
+    }
+
+    async function carregarProdutos() {
+        try {
+            const snapshot = await getDocs(collection(db, "pecas"));
+            dadosDashboard.produtos = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        } catch (error) {
+            console.error("Erro ao carregar produtos:", error);
+            dadosDashboard.produtos = [];
+        }
+    }
+
+    async function carregarVisitas() {
+        try {
+            const snapshot = await getDocs(collection(db, "visitas"));
+            dadosDashboard.visitas = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        } catch (error) {
+            console.log("Coleção de visitas ainda não criada");
+            dadosDashboard.visitas = [];
+        }
+    }
+
+    async function carregarColecoes() {
+        try {
+            const snapshot = await getDocs(collection(db, "colecoes"));
+            dadosDashboard.colecoes = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        } catch (error) {
+            console.log("Coleção de coleções ainda não criada");
+            dadosDashboard.colecoes = [];
+        }
+    }
+
+    // CORREÇÃO: Função movida para cá e corrigida
+    async function carregarEstatisticasAcesso() {
+        try {
+            // Estatísticas básicas de acesso (simuladas)
+            // Em produção, integrar com Google Analytics
+            elementos.visitasHoje.textContent = Math.floor(Math.random() * 50) + 20;
+            elementos.taxaConversao.textContent = '2.5%';
+            elementos.dispositivosMoveis.textContent = '75%';
+            elementos.paginaMaisVisitada.textContent = 'Coleção Atual';
+            
+        } catch (error) {
+            console.log("Estatísticas de acesso não disponíveis");
+        }
+    }
+
+    function calcularEstatisticas() {
+        const pedidos = dadosDashboard.pedidos;
+        const produtos = dadosDashboard.produtos;
+        const visitas = dadosDashboard.visitas;
+        const colecoes = dadosDashboard.colecoes;
+        
+        // Pedidos do mês atual
+        const agora = new Date();
+        const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1);
+        const pedidosEsteMes = pedidos.filter(pedido => {
+            if (!pedido.data) return false;
+            const dataPedido = pedido.data.toDate ? pedido.data.toDate() : new Date(pedido.data);
+            return dataPedido >= inicioMes;
+        });
+        
+        // Valor total
+        const valorTotal = pedidos.reduce((total, pedido) => total + (pedido.total || 0), 0);
+        const valorEsteMes = pedidosEsteMes.reduce((total, pedido) => total + (pedido.total || 0), 0);
+        
+        // Visitantes do mês
+        const visitasEsteMes = visitas.filter(visita => {
+            if (!visita.timestamp) return false;
+            const dataVisita = visita.timestamp.toDate ? visita.timestamp.toDate() : new Date(visita.timestamp);
+            return dataVisita >= inicioMes;
+        });
+        
+        // Produtos mais vendidos
+        const produtosVendidos = {};
+        pedidos.forEach(pedido => {
+            if (pedido.produtos) {
+                pedido.produtos.forEach(prod => {
+                    produtosVendidos[prod.nome] = (produtosVendidos[prod.nome] || 0) + (prod.quantidade || 1);
+                });
+            }
+        });
+        
+        const produtosMaisVendidos = Object.entries(produtosVendidos)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 5);
+        
+        // Total de imagens na galeria
+        let totalImagens = 0;
+        try {
+            const galeriaSnapshot = getDocs(collection(db, "galeria"));
+            totalImagens = galeriaSnapshot.docs.length;
+        } catch (error) {
+            console.log("Galeria não disponível");
+        }
+        
+        return {
+            totalPedidos: pedidos.length,
+            pedidosEsteMes: pedidosEsteMes.length,
+            valorTotal,
+            valorEsteMes,
+            totalProdutos: produtos.length,
+            produtosAtivos: produtos.filter(p => p.status !== 'inactive').length,
+            totalVisitas: visitas.length,
+            visitasEsteMes: visitasEsteMes.length,
+            produtosMaisVendidos,
+            pedidosPendentes: pedidos.filter(p => p.status === 'pendente').length,
+            colecaoAtiva: colecoes.find(c => c.ativa)?.nome || 'Nenhuma',
+            totalImagens: totalImagens
+        };
+    }
+
+    function atualizarUI() {
+        const stats = dadosDashboard.estatisticas;
+        
+        // Métricas principais
+        elementos.totalPedidos.textContent = stats.totalPedidos;
+        elementos.pedidosMes.textContent = stats.pedidosEsteMes;
+        elementos.pedidosProgress.style.width = `${Math.min((stats.pedidosEsteMes / Math.max(stats.totalPedidos, 1)) * 100, 100)}%`;
+        
+        elementos.valorTotal.textContent = `R$ ${stats.valorTotal.toFixed(2)}`;
+        elementos.receitaMes.textContent = `R$ ${stats.valorEsteMes.toFixed(2)}`;
+        elementos.receitaProgress.style.width = `${Math.min((stats.valorEsteMes / Math.max(stats.valorTotal, 1)) * 100, 100)}%`;
+        
+        elementos.totalProdutos.textContent = stats.totalProdutos;
+        elementos.produtosAtivos.textContent = `${stats.produtosAtivos} ativos`;
+        elementos.produtosProgress.style.width = `${Math.min((stats.produtosAtivos / Math.max(stats.totalProdutos, 1)) * 100, 100)}%`;
+        
+        elementos.totalVisitantes.textContent = stats.totalVisitas;
+        elementos.visitantesMes.textContent = stats.visitasEsteMes;
+        elementos.visitantesProgress.style.width = `${Math.min((stats.visitasEsteMes / Math.max(stats.totalVisitas, 1)) * 100, 100)}%`;
+        
+        // Últimos pedidos
+        renderizarUltimosPedidos();
+        
+        // Produtos mais vendidos
+        renderizarProdutosMaisVendidos();
+        
+        // Status da loja
+        elementos.colecaoAtiva.textContent = stats.colecaoAtiva;
+        elementos.pedidosPendentes.textContent = stats.pedidosPendentes;
+        elementos.totalImagens.textContent = stats.totalImagens;
+        
+        // Gráfico de visitas
+        renderizarGraficoVisitas();
+    }
+
+    function renderizarUltimosPedidos() {
+        const ultimos = dadosDashboard.pedidos.slice(0, 5);
+        
+        if (ultimos.length === 0) {
+            elementos.ultimosPedidos.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fa-solid fa-inbox text-4xl mb-4 opacity-50"></i>
+                    <p>Nenhum pedido encontrado</p>
+                </div>
+            `;
+            return;
+        }
+        
+        elementos.ultimosPedidos.innerHTML = ultimos.map(pedido => {
+            const dataFormatada = pedido.data ? 
+                (pedido.data.toDate ? pedido.data.toDate().toLocaleDateString('pt-BR') : new Date(pedido.data).toLocaleDateString('pt-BR')) : 'Data não informada';
+            
+            return `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-800">${pedido.cliente?.nome || 'Cliente não informado'}</p>
+                        <p class="text-sm text-gray-600">${dataFormatada} • ${pedido.produtos?.length || 0} itens</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-[--cor-marrom-cta]">R$ ${pedido.total?.toFixed(2) || '0,00'}</p>
+                        <span class="inline-block px-2 py-1 text-xs rounded-full ${
+                            pedido.status === 'pendente' ? 'bg-yellow-100 text-yellow-800' :
+                            pedido.status === 'enviado' ? 'bg-blue-100 text-blue-800' :
+                            'bg-green-100 text-green-800'
+                        }">
+                            ${pedido.status || 'pendente'}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderizarProdutosMaisVendidos() {
+        const maisVendidos = dadosDashboard.estatisticas.produtosMaisVendidos || [];
+        
+        if (maisVendidos.length === 0) {
+            elementos.produtosMaisVendidos.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fa-solid fa-chart-line text-4xl mb-4 opacity-50"></i>
+                    <p>Sem dados de vendas ainda</p>
+                </div>
+            `;
+            return;
+        }
+        
+        elementos.produtosMaisVendidos.innerHTML = maisVendidos.map(([nome, quantidade], index) => `
+            <div class="flex items-center justify-between p-3 border-b last:border-b-0">
+                <div class="flex items-center gap-3 flex-1">
+                    <span class="flex items-center justify-center w-6 h-6 bg-[--cor-ouro-acento] text-white text-xs font-bold rounded-full">
+                        ${index + 1}
+                    </span>
+                    <p class="font-medium text-gray-800 truncate" title="${nome}">${nome}</p>
+                </div>
+                <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium">
+                    ${quantidade} vendas
+                </span>
+            </div>
+        `).join('');
+    }
+
+    function renderizarGraficoVisitas() {
+        const dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+        const visitasPorDia = dias.map(() => Math.floor(Math.random() * 50) + 10);
+        
+        elementos.graficoVisitas.innerHTML = dias.map((dia, index) => {
+            const altura = (visitasPorDia[index] / Math.max(...visitasPorDia)) * 100;
+            return `
+                <div class="flex flex-col items-center flex-1">
+                    <div class="w-full bg-[--cor-ouro-acento] rounded-t transition-all duration-500" 
+                         style="height: ${altura}%"></div>
+                    <span class="text-xs text-gray-600 mt-1">${dia}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Event Listeners
+    elementos.timeFilter.addEventListener('change', (e) => {
+        periodoSelecionado = parseInt(e.target.value);
+        carregarDashboard();
+    });
+
+    elementos.refreshBtn.addEventListener('click', () => {
+        elementos.refreshBtn.classList.add('animate-spin');
+        carregarDashboard().finally(() => {
+            setTimeout(() => {
+                elementos.refreshBtn.classList.remove('animate-spin');
+            }, 1000);
+        });
+    });
+
+    elementos.exportBtn.addEventListener('click', () => {
+        mostrarToast("Recurso de exportação em desenvolvimento");
+    });
+
+    elementos.logoutButton.addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Erro ao fazer logout:", error);
+            mostrarToast("Erro ao tentar sair. Tente novamente.", "error");
+        }
+    });
+
+    // Atualizar a cada 2 minutos
+    setInterval(() => {
+        carregarDashboard();
+    }, 120000);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executor de Scripts | Laméd vs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        :root {
+            --cor-marrom-cta: #643f21;
+            --cor-ouro-acento: #A58A5C;
+        }
+
+        .log-info { color: #3b82f6; }
+        .log-success { color: #10b981; }
+        .log-warning { color: #f59e0b; }
+        .log-error { color: #ef4444; }
+
+        .btn-primary {
+            background-color: var(--cor-marrom-cta);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #5a3d2b;
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f4f6;
+            border-radius: 50%;
+            border-top-color: #a58a5c;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <!-- Cabeçalho -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Executor de Scripts - Laméd vs</h1>
+            <p class="text-gray-600">Ferramenta para executar scripts de manutenção no banco de dados</p>
+            <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                <p class="text-yellow-800 text-sm">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <strong>Atenção:</strong> Execute estes scripts apenas se você souber o que está fazendo. 
+                    Faça backup dos dados antes de executar scripts destrutivos.
+                </p>
+            </div>
+        </div>
+
+        <!-- Área de Scripts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Scripts Pré-definidos -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Scripts Pré-definidos</h2>
+                
+                <div class="space-y-4">
+                    <!-- Script 1: Atualizar Produtos -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-medium text-gray-800 mb-2">1. Atualizar Estrutura de Produtos</h3>
+                        <p class="text-sm text-gray-600 mb-3">
+                            Adiciona campos faltantes (status, ordem, timestamps) aos produtos existentes.
+                        </p>
+                        <button onclick="executarScript1()" class="btn-primary text-sm">
+                            <i class="fas fa-play mr-2"></i>Executar Script
+                        </button>
+                    </div>
+
+                    <!-- Script 2: Migrar Imagens para Galeria -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-medium text-gray-800 mb-2">2. Migrar Imagens para Galeria</h3>
+                        <p class="text-sm text-gray-600 mb-3">
+                            Migra imagens dos produtos para a galeria centralizada.
+                        </p>
+                        <button onclick="executarScript2()" class="btn-primary text-sm">
+                            <i class="fas fa-play mr-2"></i>Executar Script
+                        </button>
+                    </div>
+
+                    <!-- Script 3: Criar Coleção Inicial -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-medium text-gray-800 mb-2">3. Criar Coleção Inicial</h3>
+                        <p class="text-sm text-gray-600 mb-3">
+                            Cria a coleção "Na Terra Como no Céu" como coleção ativa.
+                        </p>
+                        <button onclick="executarScript3()" class="btn-primary text-sm">
+                            <i class="fas fa-play mr-2"></i>Executar Script
+                        </button>
+                    </div>
+
+                    <!-- Script 4: Limpar Dados de Teste -->
+                    <div class="border border-red-200 rounded-lg p-4 bg-red-50">
+                        <h3 class="font-medium text-red-800 mb-2">4. Limpar Dados de Teste (Perigoso)</h3>
+                        <p class="text-sm text-red-600 mb-3">
+                            Remove todos os produtos e imagens. Use apenas em ambiente de teste.
+                        </p>
+                        <button onclick="executarScript4()" class="btn-danger text-sm">
+                            <i class="fas fa-trash mr-2"></i>Executar Limpeza
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Console de Logs -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Console de Logs</h2>
+                    <button onclick="limparLogs()" class="text-sm text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-trash mr-1"></i>Limpar
+                    </button>
+                </div>
+                
+                <div id="console" class="bg-gray-900 text-gray-200 rounded-lg p-4 h-96 overflow-y-auto font-mono text-sm">
+                    <div class="text-gray-400">// Console pronto para executar scripts...</div>
+                </div>
+
+                <div class="mt-4 flex gap-2">
+                    <div id="status" class="flex-1 text-sm text-gray-600">
+                        Pronto para executar scripts
+                    </div>
+                    <div id="loading" class="hidden">
+                        <div class="loading-spinner"></div>
+                        <span class="text-sm text-gray-600 ml-2">Executando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Editor de Script Customizado -->
+        <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Script Customizado</h2>
+            <textarea id="customScript" class="w-full h-40 font-mono text-sm border border-gray-300 rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]" placeholder="// Cole seu código JavaScript aqui..."></textarea>
+            <div class="mt-4 flex gap-2">
+                <button onclick="executarCustomScript()" class="btn-primary">
+                    <i class="fas fa-play mr-2"></i>Executar Script Customizado
+                </button>
+                <button onclick="salvarScript()" class="btn-secondary">
+                    <i class="fas fa-save mr-2"></i>Salvar
+                </button>
+                <button onclick="carregarScript()" class="btn-secondary">
+                    <i class="fas fa-folder-open mr-2"></i>Carregar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCzB4_YotWCPVh1yaqWkhbB4LypPQYvV4U",
+            authDomain: "site-lamed.firebaseapp.com",
+            databaseURL: "https://site-lamed-default-rtdb.firebaseio.com",
+            projectId: "site-lamed",
+            storageBucket: "site-lamed.firebasestorage.app",
+            messagingSenderId: "862756160215",
+            appId: "1:862756160215:web:d0fded233682bf93eaa692",
+            measurementId: "G-BL1G961PGT"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Variáveis globais
+        let isExecuting = false;
+
+        // =========================================
+        // FUNÇÕES DE LOG E INTERFACE
+        // =========================================
+
+        function log(mensagem, tipo = "info") {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            
+            logEntry.className = `log-${tipo} mb-1`;
+            logEntry.innerHTML = `<span class="text-gray-500">[${timestamp}]</span> ${mensagem}`;
+            
+            console.appendChild(logEntry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function limparLogs() {
+            document.getElementById('console').innerHTML = '<div class="text-gray-400">// Console limpo</div>';
+        }
+
+        function mostrarLoading(mostrar) {
+            const loading = document.getElementById('loading');
+            const status = document.getElementById('status');
+            
+            if (mostrar) {
+                loading.classList.remove('hidden');
+                status.textContent = "Executando script...";
+                isExecuting = true;
+            } else {
+                loading.classList.add('hidden');
+                status.textContent = "Pronto para executar scripts";
+                isExecuting = false;
+            }
+        }
+
+        // =========================================
+        // SCRIPT 1: ATUALIZAR ESTRUTURA DE PRODUTOS (CORRIGIDO)
+        // =========================================
+
+        async function executarScript1() {
+            if (isExecuting) return;
+            
+            mostrarLoading(true);
+            log("Iniciando script de atualização V2 (status, ordem, timestamps)...", "info");
+
+            try {
+                const snapshot = await db.collection("pecas").get();
+                const batch = db.batch();
+                let contadorUpdates = 0;
+
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const updates = {};
+                    
+                    // Adicionar status se não existir
+                    if (typeof data.status === 'undefined') {
+                        updates.status = "active";
+                    }
+                    
+                    // Adicionar ordem se não existir  
+                    if (typeof data.ordem === 'undefined') {
+                        updates.ordem = 0;
+                    }
+                    
+                    // Adicionar timestamps se não existirem
+                    if (typeof data.createdAt === 'undefined') {
+                        updates.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    }
+                    if (typeof data.updatedAt === 'undefined') {
+                        updates.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+                    }
+                    
+                    if (Object.keys(updates).length > 0) {
+                        batch.update(doc.ref, updates);
+                        contadorUpdates++;
+                    }
+                });
+
+                if (contadorUpdates > 0) {
+                    await batch.commit();
+                    log(`✅ Sucesso! ${contadorUpdates} produtos foram atualizados.`, "success");
+                } else {
+                    log("ℹ️ Tudo certo! Nenhum produto precisava de atualização.", "info");
+                }
+
+            } catch (e) {
+                log(`❌ ERRO AO EXECUTAR SCRIPT: ${e.message}`, "error");
+                console.error("Erro do script:", e);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // =========================================
+        // SCRIPT 2: MIGRAR IMAGENS PARA GALERIA
+        // =========================================
+
+        async function executarScript2() {
+            if (isExecuting) return;
+            
+            mostrarLoading(true);
+            log("Iniciando migração de imagens para galeria central...", "info");
+
+            try {
+                const produtosSnapshot = await db.collection("pecas").get();
+                let contadorImagens = 0;
+                let contadorProdutos = 0;
+
+                for (const doc of produtosSnapshot.docs) {
+                    const produto = doc.data();
+                    
+                    if (produto.imagens && Array.isArray(produto.imagens)) {
+                        for (const imagemUrl of produto.imagens) {
+                            // Verificar se a imagem já existe na galeria
+                            const existingImage = await db.collection("galeria")
+                                .where("url", "==", imagemUrl)
+                                .get();
+                            
+                            if (existingImage.empty) {
+                                // Criar entrada na galeria
+                                await db.collection("galeria").add({
+                                    url: imagemUrl,
+                                    nomeArquivo: imagemUrl.split('/').pop() || 'imagem.jpg',
+                                    tamanho: 0,
+                                    dataUpload: firebase.firestore.FieldValue.serverTimestamp(),
+                                    tags: [produto.categoria || 'outros'],
+                                    categoria: 'produtos',
+                                    utilizadaEm: [doc.id],
+                                    status: 'active'
+                                });
+                                contadorImagens++;
+                            } else {
+                                // Atualizar entrada existente
+                                const existingDoc = existingImage.docs[0];
+                                const existingData = existingDoc.data();
+                                const updatedUsedIn = [...(existingData.utilizadaEm || []), doc.id];
+                                
+                                await existingDoc.ref.update({
+                                    utilizadaEm: updatedUsedIn
+                                });
+                                contadorImagens++;
+                            }
+                        }
+                        contadorProdutos++;
+                    }
+                }
+
+                log(`✅ Migração concluída! ${contadorImagens} imagens processadas de ${contadorProdutos} produtos.`, "success");
+
+            } catch (e) {
+                log(`❌ ERRO NA MIGRAÇÃO: ${e.message}`, "error");
+                console.error("Erro do script:", e);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // =========================================
+        // SCRIPT 3: CRIAR COLEÇÃO INICIAL
+        // =========================================
+
+        async function executarScript3() {
+            if (isExecuting) return;
+            
+            mostrarLoading(true);
+            log("Criando coleção inicial 'Na Terra Como no Céu'...", "info");
+
+            try {
+                // Verificar se já existe uma coleção ativa
+                const existingCollections = await db.collection("colecoes")
+                    .where("ativa", "==", true)
+                    .get();
+
+                if (!existingCollections.empty) {
+                    log("⚠️ Já existe uma coleção ativa. Pulando criação...", "warning");
+                    mostrarLoading(false);
+                    return;
+                }
+
+                // Criar nova coleção
+                await db.collection("colecoes").add({
+                    nome: "Na Terra Como no Céu",
+                    slug: "na-terra-como-no-ceu",
+                    descricao: "Coleção atemporal que une elegância e propósito",
+                    dataLancamento: firebase.firestore.FieldValue.serverTimestamp(),
+                    ativa: true,
+                    ordem: 1,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                log("✅ Coleção 'Na Terra Como no Céu' criada com sucesso!", "success");
+
+            } catch (e) {
+                log(`❌ ERRO AO CRIAR COLEÇÃO: ${e.message}`, "error");
+                console.error("Erro do script:", e);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // =========================================
+        // SCRIPT 4: LIMPAR DADOS DE TESTE (PERIGOSO)
+        // =========================================
+
+        async function executarScript4() {
+            if (isExecuting) return;
+            
+            const confirmacao = confirm(
+                "🚨 ATENÇÃO: ISSO IRÁ EXCLUIR TODOS OS PRODUTOS E IMAGENS!\n\n" +
+                "Esta ação não pode ser desfeita.\n" +
+                "Use apenas em ambiente de teste.\n\n" +
+                "Tem certeza que deseja continuar?"
+            );
+
+            if (!confirmacao) {
+                log("❌ Limpeza cancelada pelo usuário.", "warning");
+                return;
+            }
+
+            mostrarLoading(true);
+            log("🚨 INICIANDO LIMPEZA TOTAL DOS DADOS...", "error");
+
+            try {
+                // Limpar produtos
+                const produtosSnapshot = await db.collection("pecas").get();
+                let contadorProdutos = 0;
+                
+                for (const doc of produtosSnapshot.docs) {
+                    await doc.ref.delete();
+                    contadorProdutos++;
+                }
+
+                // Limpar galeria
+                const galeriaSnapshot = await db.collection("galeria").get();
+                let contadorImagens = 0;
+                
+                for (const doc of galeriaSnapshot.docs) {
+                    await doc.ref.delete();
+                    contadorImagens++;
+                }
+
+                log(`✅ Limpeza concluída! ${contadorProdutos} produtos e ${contadorImagens} imagens removidos.`, "success");
+
+            } catch (e) {
+                log(`❌ ERRO NA LIMPEZA: ${e.message}`, "error");
+                console.error("Erro do script:", e);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // =========================================
+        // SCRIPT CUSTOMIZADO
+        // =========================================
+
+        async function executarCustomScript() {
+            if (isExecuting) return;
+            
+            const script = document.getElementById('customScript').value.trim();
+            
+            if (!script) {
+                log("❌ Nenhum script para executar.", "error");
+                return;
+            }
+
+            mostrarLoading(true);
+            log("Executando script customizado...", "info");
+
+            try {
+                // Criar função assíncrona com o script
+                const asyncFunction = new Function('db', 'firebase', 'log', `
+                    return (async function() {
+                        ${script}
+                    })();
+                `);
+
+                await asyncFunction(db, firebase, log);
+                log("✅ Script customizado executado com sucesso!", "success");
+
+            } catch (e) {
+                log(`❌ ERRO NO SCRIPT CUSTOMIZADO: ${e.message}`, "error");
+                console.error("Erro do script customizado:", e);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        function salvarScript() {
+            const script = document.getElementById('customScript').value;
+            localStorage.setItem('customScript', script);
+            log("✅ Script salvo localmente.", "success");
+        }
+
+        function carregarScript() {
+            const script = localStorage.getItem('customScript');
+            if (script) {
+                document.getElementById('customScript').value = script;
+                log("✅ Script carregado do armazenamento local.", "success");
+            } else {
+                log("ℹ️ Nenhum script salvo encontrado.", "info");
+            }
+        }
+
+        // =========================================
+        // VERIFICAÇÃO DE AUTENTICAÇÃO
+        // =========================================
+
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                document.body.innerHTML = `
+                    <div class="max-w-md mx-auto mt-20 p-6 bg-white rounded-lg shadow-md text-center">
+                        <h2 class="text-xl font-bold text-red-600 mb-4">Acesso Negado</h2>
+                        <p class="text-gray-600 mb-4">Você precisa estar autenticado para acessar esta página.</p>
+                        <a href="login-admin.html" class="btn-primary">Fazer Login</a>
+                    </div>
+                `;
+            }
+        });
+
+        // Carregar script salvo ao iniciar
+        carregarScript();
+
+        // Log inicial
+        log("✅ Executor de scripts inicializado com sucesso!", "success");
+        log("ℹ️ Selecione um script pré-definido ou digite um script customizado.", "info");
+
+    </script>
+</body>
+</html>

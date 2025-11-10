@@ -1,0 +1,2340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria de Imagens | Painel Administrativo - Laméd vs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Allura&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cor-fundo: #FFFFFF;
+            --cor-texto: #1F2937;
+            --cor-marrom-cta: #643f21;
+            --cor-ouro-acento: #A58A5C;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--cor-texto);
+            background-color: #f8fafc;
+        }
+        
+        .font-allura { font-family: 'Allura', cursive; }
+
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-primary {
+            background-color: var(--cor-marrom-cta);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #5a3d2b;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: var(--cor-texto);
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .modal {
+            visibility: hidden;
+            opacity: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 50;
+        }
+        .modal.visivel {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            width: 90%;
+            max-width: 64rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .modal.visivel .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background-color: #f9fafb;
+        }
+        
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--cor-ouro-acento);
+            background-color: #f3f4f6;
+        }
+
+        .image-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-color: var(--cor-ouro-acento);
+        }
+        
+        .image-card.selected {
+            border-color: var(--cor-ouro-acento);
+            background-color: #fefce8;
+        }
+
+        .image-checkbox {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 0.25rem;
+            border: 2px solid #d1d5db;
+            background: white;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .image-checkbox:checked {
+            background-color: var(--cor-ouro-acento);
+            border-color: var(--cor-ouro-acento);
+        }
+        
+        .image-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f4f6;
+            border-radius: 50%;
+            border-top-color: #a58a5c;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--cor-ouro-acento), #d4af37);
+            height: 6px;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #e5e7eb;
+            color: #374151;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            margin: 0.125rem;
+        }
+        
+        .tag-remove {
+            margin-left: 0.25rem;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        
+        .tag-remove:hover {
+            opacity: 1;
+        }
+
+        .file-info {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .usage-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            z-index: 10;
+        }
+
+        .search-input:focus {
+            border-color: var(--cor-ouro-acento);
+            box-shadow: 0 0 0 3px rgba(165, 138, 92, 0.1);
+        }
+
+        .filter-select:focus {
+            border-color: var(--cor-ouro-acento);
+            box-shadow: 0 0 0 3px rgba(165, 138, 92, 0.1);
+        }
+
+        /* Animações para upload */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .uploading {
+            animation: pulse 2s infinite;
+        }
+
+        /* Scrollbar personalizada */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="dashboard.html" class="font-allura text-4xl text-[--cor-texto]">
+                        Laméd vs
+                    </a>
+                    <span class="ml-4 text-lg text-gray-500 font-medium">Galeria de Imagens</span>
+                </div>
+                
+                <!-- Menu de Navegação -->
+                <nav class="hidden md:flex items-center gap-6">
+                    <a href="dashboard.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                        <i class="fa-solid fa-chart-line mr-2"></i>Dashboard
+                    </a>
+                    <a href="produtos.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                        <i class="fa-solid fa-shirt mr-2"></i>Produtos
+                    </a>
+                    <a href="pedidos.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                        <i class="fa-solid fa-shopping-bag mr-2"></i>Pedidos
+                    </a>
+                    <a href="colecoes.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                        <i class="fa-solid fa-layer-group mr-2"></i>Coleções
+                    </a>
+                </nav>
+
+                <!-- Botões de Ação -->
+                <div class="flex items-center gap-4">
+                    <button id="upload-images-btn" class="btn-primary px-4 py-2 text-sm">
+                        <i class="fa-solid fa-upload mr-2"></i>Upload em Lote
+                    </button>
+                    <button id="add-url-btn" class="btn-secondary px-4 py-2 text-sm">
+                        <i class="fa-solid fa-link mr-2"></i>Adicionar por URL
+                    </button>
+                    <button id="logout-button" class="text-gray-600 hover:text-gray-900 text-sm" title="Sair">
+                        Sair <i class="fa-solid fa-arrow-right-from-bracket ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Cabeçalho e Estatísticas -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-800">Galeria de Imagens</h1>
+                <p class="text-gray-600">Gerencie todas as imagens do seu site</p>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 items-center">
+                <!-- Estatísticas Rápidas -->
+                <div class="flex gap-6 text-sm">
+                    <div class="text-center">
+                        <div class="font-semibold text-[--cor-marrom-cta]" id="total-images">0</div>
+                        <div class="text-gray-500">Total</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-green-600" id="used-images">0</div>
+                        <div class="text-gray-500">Em Uso</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-blue-600" id="storage-used">0 MB</div>
+                        <div class="text-gray-500">Armazenamento</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-purple-600" id="products-with-images">0</div>
+                        <div class="text-gray-500">Produtos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros e Busca -->
+        <div class="card p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Busca -->
+                <div class="md:col-span-2">
+                    <label for="search-input" class="block text-sm font-medium text-gray-700 mb-2">Buscar Imagens</label>
+                    <div class="relative">
+                        <input type="text" id="search-input" placeholder="Digite nome, tag ou categoria..." 
+                               class="search-input w-full border border-gray-300 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]">
+                        <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <!-- Filtro por Categoria -->
+                <div>
+                    <label for="category-filter" class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                    <select id="category-filter" class="filter-select w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento] bg-white">
+                        <option value="all">Todas as Categorias</option>
+                        <option value="produtos">Produtos</option>
+                        <option value="banners">Banners</option>
+                        <option value="lookbook">Lookbook</option>
+                        <option value="outras">Outras</option>
+                    </select>
+                </div>
+
+                <!-- Filtro por Status -->
+                <div>
+                    <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="status-filter" class="filter-select w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento] bg-white">
+                        <option value="all">Todos os Status</option>
+                        <option value="active">Em Uso</option>
+                        <option value="unused">Não Utilizadas</option>
+                        <option value="archived">Arquivadas</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Filtros Avançados -->
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <button id="toggle-advanced-filters" class="text-sm text-[--cor-marrom-cta] hover:underline flex items-center">
+                    <i class="fa-solid fa-sliders mr-2"></i>
+                    Filtros Avançados
+                    <i class="fa-solid fa-chevron-down ml-2 text-xs" id="advanced-filters-icon"></i>
+                </button>
+                
+                <div id="advanced-filters" class="hidden mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Filtro por Data -->
+                    <div>
+                        <label for="date-filter" class="block text-sm font-medium text-gray-700 mb-2">Data de Upload</label>
+                        <select id="date-filter" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento] bg-white">
+                            <option value="all">Todas as Datas</option>
+                            <option value="today">Hoje</option>
+                            <option value="week">Esta Semana</option>
+                            <option value="month">Este Mês</option>
+                            <option value="year">Este Ano</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Tamanho -->
+                    <div>
+                        <label for="size-filter" class="block text-sm font-medium text-gray-700 mb-2">Tamanho</label>
+                        <select id="size-filter" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento] bg-white">
+                            <option value="all">Todos os Tamanhos</option>
+                            <option value="small">Pequeno (&lt; 1MB)</option>
+                            <option value="medium">Médio (1-5MB)</option>
+                            <option value="large">Grande (&gt; 5MB)</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Produto -->
+                    <div>
+                        <label for="product-filter" class="block text-sm font-medium text-gray-700 mb-2">Associada a Produto</label>
+                        <select id="product-filter" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento] bg-white">
+                            <option value="all">Todos os Produtos</option>
+                            <option value="with-product">Com Produto</option>
+                            <option value="without-product">Sem Produto</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações em Lote -->
+        <div id="batch-actions" class="hidden card p-4 mb-6 bg-yellow-50 border-yellow-200">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <span class="font-medium text-yellow-800" id="selected-count">0 imagens</span>
+                    <span class="text-yellow-600 ml-2">selecionadas</span>
+                </div>
+                <div class="flex gap-2 flex-wrap">
+                    <button id="batch-tag" class="btn-secondary text-sm px-3 py-1">
+                        <i class="fa-solid fa-tag mr-1"></i>Adicionar Tag
+                    </button>
+                    <button id="batch-category" class="btn-secondary text-sm px-3 py-1">
+                        <i class="fa-solid fa-folder mr-1"></i>Alterar Categoria
+                    </button>
+                    <button id="batch-archive" class="btn-secondary text-sm px-3 py-1">
+                        <i class="fa-solid fa-archive mr-1"></i>Arquivar
+                    </button>
+                    <button id="batch-delete" class="btn-danger text-sm px-3 py-1">
+                        <i class="fa-solid fa-trash mr-1"></i>Excluir
+                    </button>
+                    <button id="batch-cancel" class="btn-secondary text-sm px-3 py-1">
+                        <i class="fa-solid fa-times mr-1"></i>Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de Imagens -->
+        <div class="card p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-800">Todas as Imagens</h3>
+                
+                <div class="flex items-center gap-4">
+                    <!-- Ordenação -->
+                    <select id="sort-select" class="text-sm border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-1 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento] bg-white">
+                        <option value="date-desc">Mais Recentes</option>
+                        <option value="date-asc">Mais Antigas</option>
+                        <option value="name-asc">Nome (A-Z)</option>
+                        <option value="name-desc">Nome (Z-A)</option>
+                        <option value="size-desc">Maior Tamanho</option>
+                        <option value="size-asc">Menor Tamanho</option>
+                        <option value="usage-desc">Mais Utilizadas</option>
+                    </select>
+
+                    <!-- Visualização -->
+                    <div class="flex border border-gray-300 rounded-md overflow-hidden">
+                        <button id="view-grid" class="p-2 bg-white border-r border-gray-300 text-gray-600 hover:text-[--cor-marrom-cta] view-toggle active">
+                            <i class="fa-solid fa-grid"></i>
+                        </button>
+                        <button id="view-list" class="p-2 bg-white text-gray-600 hover:text-[--cor-marrom-cta] view-toggle">
+                            <i class="fa-solid fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="text-center py-10">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[--cor-ouro-acento]"></div>
+                <p class="text-gray-600 mt-2">Carregando imagens...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="text-center py-10 hidden">
+                <i class="fa-solid fa-images text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-600">Nenhuma imagem encontrada.</p>
+                <p class="text-sm text-gray-500 mt-2">Faça upload de imagens para começar.</p>
+                <button id="empty-upload-btn" class="btn-primary mt-4 px-4 py-2">
+                    <i class="fa-solid fa-upload mr-2"></i>Upload em Lote
+                </button>
+            </div>
+
+            <!-- Grid de Imagens -->
+            <div id="images-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                <!-- Imagens serão carregadas aqui -->
+            </div>
+
+            <!-- Lista de Imagens (Alternativa) -->
+            <div id="images-list" class="hidden space-y-4">
+                <!-- Lista será carregada aqui -->
+            </div>
+
+            <!-- Paginação -->
+            <div id="pagination" class="mt-8 flex justify-between items-center hidden">
+                <div class="text-sm text-gray-600">
+                    Mostrando <span id="items-from">1</span>-<span id="items-to">12</span> de 
+                    <span id="items-total">0</span> imagens
+                </div>
+                <div class="flex gap-2">
+                    <button id="prev-page" class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div id="page-numbers" class="flex gap-1"></div>
+                    <button id="next-page" class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Upload em Lote -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content max-w-4xl">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                <h2 class="text-2xl font-semibold text-gray-800">Upload em Lote</h2>
+                <button id="close-upload-modal" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Área de Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Selecionar Imagens</label>
+                    <div id="upload-area" class="upload-area">
+                        <i class="fa-solid fa-cloud-arrow-up text-4xl text-gray-400 mb-3"></i>
+                        <p class="text-gray-600">Arraste imagens aqui ou clique para selecionar</p>
+                        <p class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG, WEBP (Máx: 5MB cada)</p>
+                        <p class="text-xs text-gray-500">Máximo: 50 imagens por vez</p>
+                        <input type="file" id="file-input" multiple accept="image/jpeg,image/png,image/webp" class="hidden">
+                        <button type="button" id="upload-button" class="btn-primary mt-4 px-6 py-2">
+                            <i class="fa-solid fa-folder-open mr-2"></i>Selecionar Imagens
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Configurações do Upload -->
+                <div class="border-t pt-6">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4">Configurações do Upload</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Categoria -->
+                        <div>
+                            <label for="upload-category" class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                            <select id="upload-category" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento] bg-white">
+                                <option value="produtos">Produtos</option>
+                                <option value="banners">Banners</option>
+                                <option value="lookbook">Lookbook</option>
+                                <option value="outras">Outras</option>
+                            </select>
+                        </div>
+
+                        <!-- Tags -->
+                        <div>
+                            <label for="upload-tags" class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                            <input type="text" id="upload-tags" 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]"
+                                   placeholder="Ex: verão, algodão, vestido">
+                            <p class="text-xs text-gray-500 mt-1">Separe as tags com vírgulas</p>
+                        </div>
+                    </div>
+
+                    <!-- Opções Avançadas -->
+                    <div class="mt-4">
+                        <button type="button" id="toggle-upload-options" class="text-sm text-[--cor-marrom-cta] hover:underline flex items-center">
+                            <i class="fa-solid fa-gear mr-2"></i>
+                            Opções Avançadas
+                            <i class="fa-solid fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                        
+                        <div id="upload-options" class="hidden mt-4 space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="compress-images" class="w-4 h-4 text-[--cor-ouro-acento] border-gray-300 rounded focus:ring-[--cor-ouro-acento]">
+                                <label for="compress-images" class="ml-2 text-sm text-gray-700">Comprimir imagens automaticamente</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="generate-thumbnails" class="w-4 h-4 text-[--cor-ouro-acento] border-gray-300 rounded focus:ring-[--cor-ouro-acento]" checked>
+                                <label for="generate-thumbnails" class="ml-2 text-sm text-gray-700">Gerar miniaturas automaticamente</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview das Imagens Selecionadas -->
+                <div class="border-t pt-6">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4">Preview das Imagens</h3>
+                    <div id="upload-preview" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-60 overflow-y-auto p-3 border border-gray-300 rounded-md">
+                        <div class="text-center text-gray-500 col-span-full py-8">
+                            <i class="fa-solid fa-image text-2xl mb-2 opacity-50"></i>
+                            <p class="text-sm">Nenhuma imagem selecionada</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-2">
+                        <span id="file-count" class="text-sm text-gray-600">0 arquivos selecionados</span>
+                        <span id="total-size" class="text-sm text-gray-600">0 MB</span>
+                    </div>
+                </div>
+
+                <!-- Progresso do Upload -->
+                <div id="upload-progress-container" class="hidden border-t pt-6">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4">Progresso do Upload</h3>
+                    
+                    <!-- Progresso Geral -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span>Progresso Geral</span>
+                            <span id="overall-progress-text">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div id="overall-progress-bar" class="progress-bar h-3 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Arquivos -->
+                    <div id="upload-file-list" class="space-y-3 max-h-40 overflow-y-auto">
+                        <!-- Lista de arquivos será preenchida aqui -->
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="flex justify-end gap-4 pt-6 border-t">
+                    <button id="cancel-upload" class="btn-secondary px-6 py-2">
+                        Cancelar
+                    </button>
+                    <button id="start-upload" class="btn-primary px-6 py-2" disabled>
+                        <i class="fa-solid fa-upload mr-2"></i>
+                        <span id="start-upload-text">Iniciar Upload</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Adicionar por URL -->
+    <div id="add-url-modal" class="modal">
+        <div class="modal-content max-w-2xl">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                <h2 class="text-2xl font-semibold text-gray-800">Adicionar Imagem por URL</h2>
+                <button id="close-add-url-modal" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            </div>
+
+            <form id="add-url-form" class="space-y-6">
+                <div>
+                    <label for="image-url" class="block text-sm font-medium text-gray-700 mb-2">URL da Imagem</label>
+                    <input type="url" id="image-url" 
+                           class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]"
+                           placeholder="https://exemplo.com/imagem.jpg" required>
+                    <p class="text-xs text-gray-500 mt-1">Cole a URL completa da imagem</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Nome -->
+                    <div>
+                        <label for="url-image-name" class="block text-sm font-medium text-gray-700 mb-2">Nome da Imagem</label>
+                        <input type="text" id="url-image-name" 
+                               class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]"
+                               placeholder="Nome para a imagem" required>
+                    </div>
+
+                    <!-- Categoria -->
+                    <div>
+                        <label for="url-category" class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                        <select id="url-category" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento] bg-white">
+                            <option value="produtos">Produtos</option>
+                            <option value="banners">Banners</option>
+                            <option value="lookbook">Lookbook</option>
+                            <option value="outras">Outras</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                <div>
+                    <label for="url-tags" class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                    <input type="text" id="url-tags" 
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]"
+                           placeholder="Ex: verão, algodão, vestido">
+                    <p class="text-xs text-gray-500 mt-1">Separe as tags com vírgulas</p>
+                </div>
+
+                <!-- Preview -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Preview</label>
+                    <div id="url-preview" class="border border-gray-300 rounded-lg p-4 bg-gray-50 min-h-32 flex items-center justify-center">
+                        <p class="text-gray-500 text-sm">A pré-visualização aparecerá aqui</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-4 pt-6 border-t">
+                    <button type="button" id="cancel-add-url" class="btn-secondary px-6 py-2">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary px-6 py-2">
+                        <i class="fa-solid fa-plus mr-2"></i>Adicionar Imagem
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Imagem -->
+    <div id="edit-image-modal" class="modal">
+        <div class="modal-content max-w-4xl">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                <h2 class="text-2xl font-semibold text-gray-800">Editar Imagem</h2>
+                <button id="close-edit-modal" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            </div>
+
+            <form id="edit-image-form" class="space-y-6">
+                <input type="hidden" id="edit-image-id">
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Preview da Imagem -->
+                    <div class="lg:col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Preview</label>
+                        <div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                            <img id="edit-image-preview" src="" class="w-full h-auto rounded max-h-64 object-contain">
+                        </div>
+                        <div class="mt-4 space-y-2 text-sm text-gray-600">
+                            <div class="flex justify-between">
+                                <span>Nome do arquivo:</span>
+                                <span id="edit-filename" class="font-medium"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Tamanho:</span>
+                                <span id="edit-filesize" class="font-medium"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Dimensões:</span>
+                                <span id="edit-dimensions" class="font-medium"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Data de upload:</span>
+                                <span id="edit-upload-date" class="font-medium"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações da Imagem -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Nome -->
+                        <div>
+                            <label for="edit-image-name" class="block text-sm font-medium text-gray-700 mb-2">Nome da Imagem</label>
+                            <input type="text" id="edit-image-name" 
+                                   class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]">
+                        </div>
+
+                        <!-- Categoria -->
+                        <div>
+                            <label for="edit-image-category" class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                            <select id="edit-image-category" 
+                                    class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento] bg-white">
+                                <option value="produtos">Produtos</option>
+                                <option value="banners">Banners</option>
+                                <option value="lookbook">Lookbook</option>
+                                <option value="outras">Outras</option>
+                            </select>
+                        </div>
+
+                        <!-- Tags -->
+                        <div>
+                            <label for="edit-image-tags" class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                            <div class="flex flex-wrap gap-2 mb-2 p-2 border border-gray-300 rounded-md min-h-12" id="edit-tags-container">
+                                <!-- Tags serão renderizadas aqui -->
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="edit-new-tag" placeholder="Nova tag..." 
+                                       class="flex-1 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]">
+                                <button type="button" id="edit-add-tag" class="btn-secondary px-3 py-2">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Produtos Associados -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Produtos que usam esta imagem</label>
+                            <div id="edit-associated-products" class="border border-gray-300 rounded-md p-3 bg-gray-50 min-h-20">
+                                <div class="text-center text-gray-500 py-4">
+                                    <i class="fa-solid fa-shirt text-xl mb-2 opacity-50"></i>
+                                    <p class="text-sm">Nenhum produto associado</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Metadados -->
+                        <div class="border-t pt-6">
+                            <h4 class="font-medium text-gray-800 mb-4">Metadados</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-600">URL:</span>
+                                    <span id="edit-image-url" class="ml-2 font-mono text-xs break-all"></span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600">ID:</span>
+                                    <span id="edit-image-db-id" class="ml-2 font-medium"></span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600">Status:</span>
+                                    <span id="edit-image-status" class="ml-2 font-medium"></span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600">Última atualização:</span>
+                                    <span id="edit-last-updated" class="ml-2 font-medium"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="flex justify-between items-center pt-6 border-t">
+                    <div>
+                        <button type="button" id="delete-image-btn" class="btn-danger px-4 py-2">
+                            <i class="fa-solid fa-trash mr-2"></i>Excluir Imagem
+                        </button>
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <button type="button" id="cancel-edit" class="btn-secondary px-4 py-2">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="save-image-btn" class="btn-primary px-4 py-2">
+                            <i class="fa-solid fa-save mr-2"></i>Salvar Alterações
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="delete-confirm-modal" class="modal">
+        <div class="modal-content max-w-md">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                    <i class="fa-solid fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-2" id="delete-confirm-title">Excluir Imagem</h3>
+                <p class="text-sm text-gray-500 mb-6" id="delete-confirm-message">
+                    Tem certeza que deseja excluir esta imagem? Esta ação não pode ser desfeita.
+                </p>
+                
+                <div class="flex gap-3 justify-center">
+                    <button id="cancel-delete" class="btn-secondary px-6 py-2">
+                        Cancelar
+                    </button>
+                    <button id="confirm-delete" class="btn-danger px-6 py-2">
+                        <i class="fa-solid fa-trash mr-2"></i>Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="hidden fixed bottom-10 right-10 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 z-50">
+        <span id="toast-message">Ação realizada com sucesso!</span>
+    </div>
+
+    <!-- Scripts Firebase -->
+    <script type="module">
+        // ===================================
+        // CONFIGURAÇÃO FIREBASE
+        // ===================================
+        
+        const firebaseConfig = {
+          apiKey: "AIzaSyCzB4_YotWCPVh1yaqWkhbB4LypPQYvV4U",
+          authDomain: "site-lamed.firebaseapp.com",
+          databaseURL: "https://site-lamed-default-rtdb.firebaseio.com",
+          projectId: "site-lamed",
+          storageBucket: "site-lamed.firebasestorage.app",
+          messagingSenderId: "862756160215",
+          appId: "1:862756160215:web:d0fded233682bf93eaa692",
+          measurementId: "G-BL1G961PGT"
+        };
+        
+        // Importações do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { 
+            getAuth, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            onSnapshot,
+            addDoc, 
+            doc, 
+            updateDoc, 
+            deleteDoc, 
+            query,
+            where,
+            orderBy,
+            getDocs,
+            writeBatch,
+            arrayRemove,
+            arrayUnion
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import {
+            getStorage,
+            ref,
+            uploadBytesResumable,
+            getDownloadURL,
+            deleteObject
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+        // Inicialização dos Serviços
+        let app, auth, db, storage;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            storage = getStorage(app);
+        } catch (error) {
+            console.error("Erro fatal ao inicializar o Firebase:", error);
+            mostrarToast("Erro de configuração do Firebase", "error");
+        }
+
+        // ===================================
+        // VARIÁVEIS GLOBAIS
+        // ===================================
+        let galeriaImagens = [];
+        let produtos = [];
+        let selectedImages = new Set();
+        let currentView = 'grid';
+        let currentPage = 1;
+        const itemsPerPage = 24;
+        let filteredImages = [];
+        let filesToUpload = [];
+        let currentEditImageId = null;
+
+        // ===================================
+        // ELEMENTOS DOM
+        // ===================================
+        const elementos = {
+            // Botões principais
+            uploadImagesBtn: document.getElementById('upload-images-btn'),
+            addUrlBtn: document.getElementById('add-url-btn'),
+            logoutButton: document.getElementById('logout-button'),
+            emptyUploadBtn: document.getElementById('empty-upload-btn'),
+
+            // Filtros e busca
+            searchInput: document.getElementById('search-input'),
+            categoryFilter: document.getElementById('category-filter'),
+            statusFilter: document.getElementById('status-filter'),
+            dateFilter: document.getElementById('date-filter'),
+            sizeFilter: document.getElementById('size-filter'),
+            productFilter: document.getElementById('product-filter'),
+            sortSelect: document.getElementById('sort-select'),
+            
+            // Filtros avançados
+            toggleAdvancedFilters: document.getElementById('toggle-advanced-filters'),
+            advancedFilters: document.getElementById('advanced-filters'),
+            advancedFiltersIcon: document.getElementById('advanced-filters-icon'),
+
+            // Visualização
+            viewGrid: document.getElementById('view-grid'),
+            viewList: document.getElementById('view-list'),
+            imagesGrid: document.getElementById('images-grid'),
+            imagesList: document.getElementById('images-list'),
+
+            // Estados
+            loadingState: document.getElementById('loading-state'),
+            emptyState: document.getElementById('empty-state'),
+
+            // Estatísticas
+            totalImages: document.getElementById('total-images'),
+            usedImages: document.getElementById('used-images'),
+            storageUsed: document.getElementById('storage-used'),
+            productsWithImages: document.getElementById('products-with-images'),
+
+            // Ações em lote
+            batchActions: document.getElementById('batch-actions'),
+            selectedCount: document.getElementById('selected-count'),
+            batchTag: document.getElementById('batch-tag'),
+            batchCategory: document.getElementById('batch-category'),
+            batchArchive: document.getElementById('batch-archive'),
+            batchDelete: document.getElementById('batch-delete'),
+            batchCancel: document.getElementById('batch-cancel'),
+
+            // Paginação
+            pagination: document.getElementById('pagination'),
+            itemsFrom: document.getElementById('items-from'),
+            itemsTo: document.getElementById('items-to'),
+            itemsTotal: document.getElementById('items-total'),
+            prevPage: document.getElementById('prev-page'),
+            nextPage: document.getElementById('next-page'),
+            pageNumbers: document.getElementById('page-numbers'),
+
+            // Modais
+            uploadModal: document.getElementById('upload-modal'),
+            addUrlModal: document.getElementById('add-url-modal'),
+            editImageModal: document.getElementById('edit-image-modal'),
+            deleteConfirmModal: document.getElementById('delete-confirm-modal')
+        };
+
+        // ===================================
+        // INICIALIZAÇÃO
+        // ===================================
+        function init() {
+            console.log("Iniciando galeria de imagens...");
+            
+            // Verificar autenticação
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    window.location.href = './login-admin.html';
+                } else {
+                    carregarDados();
+                    setupEventListeners();
+                    setupUrlModal();
+                }
+            });
+        }
+
+        // Carregar todos os dados necessários
+        async function carregarDados() {
+            try {
+                elementos.loadingState.classList.remove('hidden');
+                elementos.emptyState.classList.add('hidden');
+
+                await Promise.all([
+                    carregarGaleria(),
+                    carregarProdutos()
+                ]);
+
+                aplicarFiltros();
+                atualizarEstatisticas();
+                
+            } catch (error) {
+                console.error("Erro ao carregar dados:", error);
+                mostrarToast("Erro ao carregar dados", "error");
+            } finally {
+                elementos.loadingState.classList.add('hidden');
+            }
+        }
+
+        // ===================================
+        // CARREGAMENTO DE DADOS
+        // ===================================
+        async function carregarGaleria() {
+            return new Promise((resolve, reject) => {
+                const q = query(collection(db, "galeria"), orderBy("dataUpload", "desc"));
+                
+                onSnapshot(q, (snapshot) => {
+                    galeriaImagens = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data(),
+                        // Garantir campos padrão
+                        tags: doc.data().tags || [],
+                        utilizadaEm: doc.data().utilizadaEm || [],
+                        categoria: doc.data().categoria || 'outras',
+                        status: doc.data().status || 'active',
+                        isExternal: doc.data().isExternal || false,
+                        path: doc.data().path || ''
+                    }));
+                    
+                    filteredImages = [...galeriaImagens];
+                    renderizarImagens();
+                    resolve();
+                }, reject);
+            });
+        }
+
+        async function carregarProdutos() {
+            try {
+                const snapshot = await getDocs(collection(db, "pecas"));
+                produtos = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+            } catch (error) {
+                console.log("Erro ao carregar produtos:", error);
+                produtos = [];
+            }
+        }
+
+        // ===================================
+        // RENDERIZAÇÃO
+        // ===================================
+        function renderizarImagens() {
+            if (filteredImages.length === 0) {
+                elementos.emptyState.classList.remove('hidden');
+                elementos.imagesGrid.innerHTML = '';
+                elementos.imagesList.innerHTML = '';
+                elementos.pagination.classList.add('hidden');
+                return;
+            }
+
+            elementos.emptyState.classList.add('hidden');
+
+            // Paginação
+            const totalPages = Math.ceil(filteredImages.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredImages.length);
+            const imagensPagina = filteredImages.slice(startIndex, endIndex);
+
+            // Atualizar informações de paginação
+            elementos.itemsFrom.textContent = startIndex + 1;
+            elementos.itemsTo.textContent = endIndex;
+            elementos.itemsTotal.textContent = filteredImages.length;
+
+            // Renderizar de acordo com a visualização
+            if (currentView === 'grid') {
+                renderizarGridView(imagensPagina);
+            } else {
+                renderizarListView(imagensPagina);
+            }
+
+            // Atualizar paginação
+            atualizarPaginacao(totalPages);
+        }
+
+        function renderizarGridView(imagens) {
+            elementos.imagesGrid.innerHTML = imagens.map(imagem => {
+                const usageCount = imagem.utilizadaEm ? imagem.utilizadaEm.length : 0;
+                const fileSizeMB = (imagem.tamanho / (1024 * 1024)).toFixed(1);
+                
+                return `
+                <div class="image-card card p-3 relative ${selectedImages.has(imagem.id) ? 'selected' : ''}" data-image-id="${imagem.id}">
+                    <!-- Checkbox para seleção -->
+                    <input type="checkbox" class="image-checkbox" 
+                           ${selectedImages.has(imagem.id) ? 'checked' : ''}>
+
+                    <!-- Badge de uso -->
+                    ${usageCount > 0 ? `
+                        <div class="usage-badge">
+                            <i class="fa-solid fa-link mr-1"></i>${usageCount}
+                        </div>
+                    ` : ''}
+
+                    <!-- Imagem -->
+                    <div class="w-full h-32 bg-gray-200 rounded-lg overflow-hidden mb-3">
+                        <img src="${imagem.url}" 
+                             alt="${imagem.nomeArquivo}" 
+                             class="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer view-image"
+                             loading="lazy">
+                    </div>
+
+                    <!-- Informações -->
+                    <div class="space-y-2">
+                        <h4 class="font-medium text-gray-800 text-sm truncate" title="${imagem.nomeArquivo}">
+                            ${imagem.nomeArquivo}
+                        </h4>
+                        
+                        <div class="flex justify-between items-center text-xs text-gray-600">
+                            <span>${fileSizeMB} MB</span>
+                            <span class="capitalize">${imagem.categoria}</span>
+                        </div>
+
+                        <!-- Tags -->
+                        ${imagem.tags && imagem.tags.length > 0 ? `
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                ${imagem.tags.slice(0, 2).map(tag => `
+                                    <span class="tag">${tag}</span>
+                                `).join('')}
+                                ${imagem.tags.length > 2 ? `
+                                    <span class="tag">+${imagem.tags.length - 2}</span>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+
+                        <!-- Ações -->
+                        <div class="flex gap-1 pt-2 border-t border-gray-200">
+                            <button class="edit-image flex-1 text-center text-xs bg-blue-50 text-blue-700 py-1 rounded hover:bg-blue-100 transition-colors" 
+                                    data-image-id="${imagem.id}">
+                                <i class="fa-solid fa-pen mr-1"></i>Editar
+                            </button>
+                            <button class="delete-image text-xs bg-red-50 text-red-700 p-1 rounded hover:bg-red-100 transition-colors" 
+                                    data-image-id="${imagem.id}">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            elementos.imagesGrid.classList.remove('hidden');
+            elementos.imagesList.classList.add('hidden');
+        }
+
+        function renderizarListView(imagens) {
+            elementos.imagesList.innerHTML = imagens.map(imagem => {
+                const usageCount = imagem.utilizadaEm ? imagem.utilizadaEm.length : 0;
+                const fileSizeMB = (imagem.tamanho / (1024 * 1024)).toFixed(1);
+                const uploadDate = imagem.dataUpload ? 
+                    new Date(imagem.dataUpload.seconds * 1000).toLocaleDateString('pt-BR') : '-';
+                
+                return `
+                <div class="image-card card p-4 flex items-center gap-4 ${selectedImages.has(imagem.id) ? 'selected' : ''}" data-image-id="${imagem.id}">
+                    <!-- Checkbox -->
+                    <input type="checkbox" class="image-checkbox" 
+                           ${selectedImages.has(imagem.id) ? 'checked' : ''}>
+
+                    <!-- Imagem -->
+                    <div class="w-16 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                        <img src="${imagem.url}" 
+                             alt="${imagem.nomeArquivo}" 
+                             class="w-full h-full object-cover cursor-pointer view-image">
+                    </div>
+
+                    <!-- Informações -->
+                    <div class="flex-1 grid grid-cols-5 gap-4 items-center">
+                        <div>
+                            <h4 class="font-medium text-gray-800 text-sm">${imagem.nomeArquivo}</h4>
+                            <p class="text-xs text-gray-600">${uploadDate}</p>
+                        </div>
+                        
+                        <div class="text-center">
+                            <span class="text-sm font-medium">${fileSizeMB} MB</span>
+                        </div>
+                        
+                        <div class="text-center">
+                            <span class="text-sm capitalize">${imagem.categoria}</span>
+                        </div>
+                        
+                        <div class="text-center">
+                            <span class="text-sm ${usageCount > 0 ? 'text-green-600' : 'text-gray-500'}">
+                                ${usageCount} uso${usageCount !== 1 ? 's' : ''}
+                            </span>
+                        </div>
+
+                        <div class="text-center">
+                            <div class="flex flex-wrap gap-1 justify-center">
+                                ${imagem.tags && imagem.tags.slice(0, 2).map(tag => `
+                                    <span class="tag text-xs">${tag}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ações -->
+                    <div class="flex gap-2 flex-shrink-0">
+                        <button class="edit-image text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded hover:bg-blue-100 transition-colors" 
+                                data-image-id="${imagem.id}">
+                            <i class="fa-solid fa-pen mr-1"></i>Editar
+                        </button>
+                        <button class="delete-image text-sm bg-red-50 text-red-700 px-3 py-1 rounded hover:bg-red-100 transition-colors" 
+                                data-image-id="${imagem.id}">
+                            <i class="fa-solid fa-trash mr-1"></i>Excluir
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            elementos.imagesList.classList.remove('hidden');
+            elementos.imagesGrid.classList.add('hidden');
+        }
+
+        // ===================================
+        // FILTROS E ORDENAÇÃO
+        // ===================================
+        function aplicarFiltros() {
+            let resultados = [...galeriaImagens];
+
+            // Filtro de busca
+            const termoBusca = elementos.searchInput.value.toLowerCase();
+            if (termoBusca) {
+                resultados = resultados.filter(imagem => 
+                    imagem.nomeArquivo.toLowerCase().includes(termoBusca) ||
+                    (imagem.tags && imagem.tags.some(tag => tag.toLowerCase().includes(termoBusca))) ||
+                    imagem.categoria.toLowerCase().includes(termoBusca)
+                );
+            }
+
+            // Filtro de categoria
+            const categoria = elementos.categoryFilter.value;
+            if (categoria !== 'all') {
+                resultados = resultados.filter(imagem => imagem.categoria === categoria);
+            }
+
+            // Filtro de status
+            const status = elementos.statusFilter.value;
+            if (status !== 'all') {
+                resultados = resultados.filter(imagem => {
+                    if (status === 'active') return imagem.utilizadaEm && imagem.utilizadaEm.length > 0;
+                    if (status === 'unused') return !imagem.utilizadaEm || imagem.utilizadaEm.length === 0;
+                    if (status === 'archived') return imagem.status === 'archived';
+                    return true;
+                });
+            }
+
+            // Filtro de data
+            const data = elementos.dateFilter.value;
+            if (data !== 'all' && data) {
+                const agora = new Date();
+                let dataInicio = new Date();
+                
+                switch (data) {
+                    case 'today':
+                        dataInicio.setHours(0, 0, 0, 0);
+                        break;
+                    case 'week':
+                        dataInicio.setDate(agora.getDate() - 7);
+                        break;
+                    case 'month':
+                        dataInicio.setMonth(agora.getMonth() - 1);
+                        break;
+                    case 'year':
+                        dataInicio.setFullYear(agora.getFullYear() - 1);
+                        break;
+                }
+                
+                resultados = resultados.filter(imagem => {
+                    if (!imagem.dataUpload) return false;
+                    const dataUpload = new Date(imagem.dataUpload.seconds * 1000);
+                    return dataUpload >= dataInicio;
+                });
+            }
+
+            // Filtro de tamanho
+            const tamanho = elementos.sizeFilter.value;
+            if (tamanho !== 'all') {
+                resultados = resultados.filter(imagem => {
+                    const sizeMB = imagem.tamanho / (1024 * 1024);
+                    switch (tamanho) {
+                        case 'small': return sizeMB < 1;
+                        case 'medium': return sizeMB >= 1 && sizeMB <= 5;
+                        case 'large': return sizeMB > 5;
+                        default: return true;
+                    }
+                });
+            }
+
+            // Filtro de produto
+            const produto = elementos.productFilter.value;
+            if (produto !== 'all') {
+                resultados = resultados.filter(imagem => {
+                    if (produto === 'with-product') return imagem.utilizadaEm && imagem.utilizadaEm.length > 0;
+                    if (produto === 'without-product') return !imagem.utilizadaEm || imagem.utilizadaEm.length === 0;
+                    return true;
+                });
+            }
+
+            // Ordenação
+            const ordenacao = elementos.sortSelect.value;
+            resultados.sort((a, b) => {
+                switch (ordenacao) {
+                    case 'date-desc': 
+                        return new Date(b.dataUpload?.seconds * 1000 || 0) - new Date(a.dataUpload?.seconds * 1000 || 0);
+                    case 'date-asc': 
+                        return new Date(a.dataUpload?.seconds * 1000 || 0) - new Date(b.dataUpload?.seconds * 1000 || 0);
+                    case 'name-asc': 
+                        return (a.nomeArquivo || '').localeCompare(b.nomeArquivo || '');
+                    case 'name-desc': 
+                        return (b.nomeArquivo || '').localeCompare(a.nomeArquivo || '');
+                    case 'size-desc': 
+                        return (b.tamanho || 0) - (a.tamanho || 0);
+                    case 'size-asc': 
+                        return (a.tamanho || 0) - (b.tamanho || 0);
+                    case 'usage-desc': 
+                        return (b.utilizadaEm?.length || 0) - (a.utilizadaEm?.length || 0);
+                    default: return 0;
+                }
+            });
+
+            filteredImages = resultados;
+            currentPage = 1; // Reset para primeira página
+            renderizarImagens();
+        }
+
+        // ===================================
+        // FUNÇÕES UTILITÁRIAS
+        // ===================================
+        function atualizarEstatisticas() {
+            elementos.totalImages.textContent = galeriaImagens.length;
+            
+            // Imagens em uso
+            const usedImages = galeriaImagens.filter(img => img.utilizadaEm && img.utilizadaEm.length > 0).length;
+            elementos.usedImages.textContent = usedImages;
+            
+            // Armazenamento total
+            const totalStorage = galeriaImagens.reduce((total, img) => total + (img.tamanho || 0), 0);
+            const totalStorageMB = (totalStorage / (1024 * 1024)).toFixed(1);
+            elementos.storageUsed.textContent = `${totalStorageMB} MB`;
+            
+            // Produtos com imagens
+            const productsWithImages = produtos.filter(prod => prod.imagens && prod.imagens.length > 0).length;
+            elementos.productsWithImages.textContent = productsWithImages;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function mostrarToast(message, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.className = `fixed bottom-10 right-10 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 z-50 ${
+                type === "error" ? "bg-red-600" : "bg-green-600"
+            } text-white`;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // ===================================
+        // CONFIGURAÇÃO DE EVENT LISTENERS
+        // ===================================
+        function setupEventListeners() {
+            // Filtros e busca
+            elementos.searchInput.addEventListener('input', debounce(aplicarFiltros, 300));
+            elementos.categoryFilter.addEventListener('change', aplicarFiltros);
+            elementos.statusFilter.addEventListener('change', aplicarFiltros);
+            elementos.dateFilter.addEventListener('change', aplicarFiltros);
+            elementos.sizeFilter.addEventListener('change', aplicarFiltros);
+            elementos.productFilter.addEventListener('change', aplicarFiltros);
+            elementos.sortSelect.addEventListener('change', aplicarFiltros);
+
+            // Filtros avançados
+            elementos.toggleAdvancedFilters.addEventListener('click', () => {
+                elementos.advancedFilters.classList.toggle('hidden');
+                const icon = elementos.advancedFiltersIcon;
+                icon.className = elementos.advancedFilters.classList.contains('hidden') ? 
+                    'fa-solid fa-chevron-down ml-2 text-xs' : 
+                    'fa-solid fa-chevron-up ml-2 text-xs';
+            });
+
+            // Visualização
+            elementos.viewGrid.addEventListener('click', () => {
+                currentView = 'grid';
+                elementos.viewGrid.classList.add('active', 'bg-gray-100');
+                elementos.viewList.classList.remove('active', 'bg-gray-100');
+                renderizarImagens();
+            });
+
+            elementos.viewList.addEventListener('click', () => {
+                currentView = 'list';
+                elementos.viewList.classList.add('active', 'bg-gray-100');
+                elementos.viewGrid.classList.remove('active', 'bg-gray-100');
+                renderizarImagens();
+            });
+
+            // Ações em lote
+            elementos.batchTag.addEventListener('click', adicionarTagEmLote);
+            elementos.batchCategory.addEventListener('click', alterarCategoriaEmLote);
+            elementos.batchArchive.addEventListener('click', arquivarEmLote);
+            elementos.batchDelete.addEventListener('click', excluirEmLote);
+            elementos.batchCancel.addEventListener('click', cancelarSelecaoEmLote);
+
+            // Paginação
+            elementos.prevPage.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderizarImagens();
+                }
+            });
+
+            elementos.nextPage.addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredImages.length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderizarImagens();
+                }
+            });
+
+            // Logout
+            elementos.logoutButton.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                } catch (error) {
+                    console.error("Erro ao fazer logout:", error);
+                    mostrarToast("Erro ao tentar sair", "error");
+                }
+            });
+
+            // Upload
+            elementos.uploadImagesBtn.addEventListener('click', abrirModalUpload);
+            elementos.emptyUploadBtn.addEventListener('click', abrirModalUpload);
+
+            // Adicionar por URL
+            elementos.addUrlBtn.addEventListener('click', abrirModalUrl);
+
+            // Delegation para eventos dinâmicos
+            document.addEventListener('click', (e) => {
+                // Checkbox de seleção
+                if (e.target.classList.contains('image-checkbox')) {
+                    toggleSelecaoImagem(e.target);
+                }
+
+                // Editar imagem
+                if (e.target.classList.contains('edit-image') || e.target.closest('.edit-image')) {
+                    const imageId = e.target.dataset.imageId || e.target.closest('.edit-image').dataset.imageId;
+                    abrirModalEdicao(imageId);
+                }
+
+                // Excluir imagem
+                if (e.target.classList.contains('delete-image') || e.target.closest('.delete-image')) {
+                    const imageId = e.target.dataset.imageId || e.target.closest('.delete-image').dataset.imageId;
+                    confirmarExclusao(imageId);
+                }
+
+                // Visualizar imagem
+                if (e.target.classList.contains('view-image')) {
+                    const imageCard = e.target.closest('.image-card');
+                    const imageId = imageCard.dataset.imageId;
+                    abrirModalEdicao(imageId);
+                }
+            });
+
+            // Configurar modal de upload
+            setupUploadModal();
+        }
+
+        // ===================================
+        // FUNÇÕES DE PAGINAÇÃO
+        // ===================================
+        function atualizarPaginacao(totalPages) {
+            if (totalPages <= 1) {
+                elementos.pagination.classList.add('hidden');
+                return;
+            }
+
+            elementos.pagination.classList.remove('hidden');
+            
+            // Botões anterior/próximo
+            elementos.prevPage.disabled = currentPage === 1;
+            elementos.nextPage.disabled = currentPage === totalPages;
+
+            // Números das páginas
+            elementos.pageNumbers.innerHTML = '';
+            const maxPages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
+            let endPage = Math.min(totalPages, startPage + maxPages - 1);
+
+            if (endPage - startPage + 1 < maxPages) {
+                startPage = Math.max(1, endPage - maxPages + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const button = document.createElement('button');
+                button.className = `px-3 py-1 border border-gray-300 rounded-md text-sm ${
+                    i === currentPage ? 'bg-[--cor-ouro-acento] text-white border-[--cor-ouro-acento]' : ''
+                }`;
+                button.textContent = i;
+                button.addEventListener('click', () => {
+                    currentPage = i;
+                    renderizarImagens();
+                });
+                elementos.pageNumbers.appendChild(button);
+            }
+        }
+
+        // ===================================
+        // FUNÇÕES DE SELEÇÃO EM LOTE
+        // ===================================
+        function toggleSelecaoImagem(checkbox) {
+            const imageCard = checkbox.closest('[data-image-id]');
+            if (!imageCard) return;
+            
+            const imageId = imageCard.dataset.imageId;
+            
+            if (checkbox.checked) {
+                selectedImages.add(imageId);
+                imageCard.classList.add('selected');
+            } else {
+                selectedImages.delete(imageId);
+                imageCard.classList.remove('selected');
+            }
+
+            atualizarInterfaceSelecaoEmLote();
+        }
+
+        function atualizarInterfaceSelecaoEmLote() {
+            const count = selectedImages.size;
+            
+            if (count > 0) {
+                elementos.batchActions.classList.remove('hidden');
+                elementos.selectedCount.textContent = `${count} imagem${count > 1 ? 'ens' : ''}`;
+            } else {
+                elementos.batchActions.classList.add('hidden');
+            }
+        }
+
+        async function adicionarTagEmLote() {
+            if (selectedImages.size === 0) return;
+
+            const tag = prompt('Digite a tag para adicionar às imagens selecionadas:');
+            if (!tag) return;
+
+            try {
+                const batch = writeBatch(db);
+                
+                for (const imageId of selectedImages) {
+                    const imageRef = doc(db, "galeria", imageId);
+                    batch.update(imageRef, { 
+                        tags: arrayUnion(tag.trim()),
+                        updatedAt: new Date()
+                    });
+                }
+                
+                await batch.commit();
+                mostrarToast(`Tag "${tag}" adicionada a ${selectedImages.size} imagem(ns)!`);
+                selectedImages.clear();
+                atualizarInterfaceSelecaoEmLote();
+                
+            } catch (error) {
+                console.error("Erro ao adicionar tag:", error);
+                mostrarToast("Erro ao adicionar tag", "error");
+            }
+        }
+
+        async function alterarCategoriaEmLote() {
+            if (selectedImages.size === 0) return;
+
+            const categoria = prompt('Digite a nova categoria (produtos, banners, lookbook, outras):');
+            if (!categoria) return;
+
+            const categoriasValidas = ['produtos', 'banners', 'lookbook', 'outras'];
+            if (!categoriasValidas.includes(categoria)) {
+                mostrarToast("Categoria inválida", "error");
+                return;
+            }
+
+            try {
+                const batch = writeBatch(db);
+                
+                for (const imageId of selectedImages) {
+                    const imageRef = doc(db, "galeria", imageId);
+                    batch.update(imageRef, { 
+                        categoria: categoria,
+                        updatedAt: new Date()
+                    });
+                }
+                
+                await batch.commit();
+                mostrarToast(`Categoria alterada para ${selectedImages.size} imagem(ns)!`);
+                selectedImages.clear();
+                atualizarInterfaceSelecaoEmLote();
+                
+            } catch (error) {
+                console.error("Erro ao alterar categoria:", error);
+                mostrarToast("Erro ao alterar categoria", "error");
+            }
+        }
+
+        async function arquivarEmLote() {
+            if (selectedImages.size === 0) return;
+
+            try {
+                const batch = writeBatch(db);
+                
+                for (const imageId of selectedImages) {
+                    const imageRef = doc(db, "galeria", imageId);
+                    batch.update(imageRef, { 
+                        status: 'archived',
+                        updatedAt: new Date()
+                    });
+                }
+                
+                await batch.commit();
+                mostrarToast(`${selectedImages.size} imagem(ns) arquivada(s)!`);
+                selectedImages.clear();
+                atualizarInterfaceSelecaoEmLote();
+                
+            } catch (error) {
+                console.error("Erro ao arquivar imagens:", error);
+                mostrarToast("Erro ao arquivar imagens", "error");
+            }
+        }
+
+        async function excluirEmLote() {
+            if (selectedImages.size === 0) return;
+
+            if (!confirm(`Tem certeza que deseja excluir ${selectedImages.size} imagem(ns)?\nEsta ação não pode ser desfeita e removerá as imagens do Storage.`)) {
+                return;
+            }
+
+            const imagesToDelete = [...selectedImages]; // Copiar para array
+            let successfulDeletes = 0;
+            let failedDeletes = 0;
+
+            try {
+                for (const imageId of imagesToDelete) {
+                    const imagem = galeriaImagens.find(img => img.id === imageId);
+                    if (imagem) {
+                        try {
+                            // Tentar extrair caminho e excluir do Storage
+                            if (!imagem.isExternal && imagem.path) {
+                                try {
+                                    const storageRef = ref(storage, imagem.path);
+                                    await deleteObject(storageRef);
+                                } catch (storageError) {
+                                    console.warn(`Não foi possível excluir do Storage: ${imagem.nomeArquivo}`, storageError);
+                                }
+                            }
+                            
+                            // Excluir do Firestore
+                            await deleteDoc(doc(db, "galeria", imageId));
+                            successfulDeletes++;
+                            
+                        } catch (error) {
+                            console.error(`Erro ao excluir ${imagem.nomeArquivo}:`, error);
+                            failedDeletes++;
+                        }
+                    }
+                }
+
+                // Limpar seleção independente do resultado
+                selectedImages.clear();
+                atualizarInterfaceSelecaoEmLote();
+                
+                // Mostrar resultado
+                if (failedDeletes === 0) {
+                    mostrarToast(`${successfulDeletes} imagem(ns) excluída(s) com sucesso!`);
+                } else if (successfulDeletes > 0) {
+                    mostrarToast(`${successfulDeletes} imagem(ns) excluída(s), ${failedDeletes} falha(s)`, "error");
+                } else {
+                    mostrarToast("Erro ao excluir imagens", "error");
+                }
+                
+            } catch (error) {
+                console.error("Erro geral na exclusão em lote:", error);
+                // Garantir que a seleção seja limpa mesmo em erro geral
+                selectedImages.clear();
+                atualizarInterfaceSelecaoEmLote();
+                mostrarToast("Erro ao excluir imagens", "error");
+            }
+        }
+
+        function cancelarSelecaoEmLote() {
+            selectedImages.clear();
+            document.querySelectorAll('.image-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.querySelectorAll('.image-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            atualizarInterfaceSelecaoEmLote();
+        }
+
+        // ===================================
+        // SISTEMA DE UPLOAD
+        // ===================================
+        function setupUploadModal() {
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            const uploadButton = document.getElementById('upload-button');
+            const uploadPreview = document.getElementById('upload-preview');
+            const startUploadBtn = document.getElementById('start-upload');
+            const cancelUploadBtn = document.getElementById('cancel-upload');
+
+            // Configurar área de upload
+            uploadButton.addEventListener('click', () => fileInput.click());
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFileSelection(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFileSelection(e.target.files);
+            });
+
+            // Botões
+            startUploadBtn.addEventListener('click', iniciarUpload);
+            cancelUploadBtn.addEventListener('click', () => {
+                elementos.uploadModal.classList.remove('visivel');
+                resetUploadModal();
+            });
+
+            // Fechar modal
+            document.getElementById('close-upload-modal').addEventListener('click', () => {
+                elementos.uploadModal.classList.remove('visivel');
+                resetUploadModal();
+            });
+        }
+
+        function handleFileSelection(files) {
+            const validFiles = Array.from(files).filter(file => 
+                file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024 // 5MB max
+            );
+            
+            if (validFiles.length === 0) {
+                mostrarToast("Por favor, selecione apenas imagens válidas (máx 5MB cada).", "error");
+                return;
+            }
+            
+            if (validFiles.length > 50) {
+                mostrarToast("Máximo de 50 imagens por vez.", "error");
+                return;
+            }
+
+            filesToUpload = validFiles;
+            atualizarPreviewUpload();
+            document.getElementById('start-upload').disabled = false;
+        }
+
+        function atualizarPreviewUpload() {
+            const preview = document.getElementById('upload-preview');
+            const fileCount = document.getElementById('file-count');
+            const totalSize = document.getElementById('total-size');
+            
+            if (filesToUpload.length === 0) {
+                preview.innerHTML = `
+                    <div class="text-center text-gray-500 col-span-full py-8">
+                        <i class="fa-solid fa-image text-2xl mb-2 opacity-50"></i>
+                        <p class="text-sm">Nenhuma imagem selecionada</p>
+                    </div>
+                `;
+                fileCount.textContent = '0 arquivos selecionados';
+                totalSize.textContent = '0 MB';
+                return;
+            }
+
+            // Calcular tamanho total
+            const totalSizeBytes = filesToUpload.reduce((total, file) => total + file.size, 0);
+            const totalSizeMB = (totalSizeBytes / (1024 * 1024)).toFixed(1);
+
+            fileCount.textContent = `${filesToUpload.length} arquivo${filesToUpload.length > 1 ? 's' : ''} selecionado${filesToUpload.length > 1 ? 's' : ''}`;
+            totalSize.textContent = `${totalSizeMB} MB`;
+
+            // Gerar previews
+            preview.innerHTML = filesToUpload.map((file, index) => {
+                const objectUrl = URL.createObjectURL(file);
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+                
+                return `
+                <div class="relative group">
+                    <img src="${objectUrl}" alt="${file.name}" class="w-full h-20 object-cover rounded border border-gray-300">
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded flex items-center justify-center">
+                        <button type="button" class="remove-file opacity-0 group-hover:opacity-100 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center" data-index="${index}">
+                            ×
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-600 mt-1 truncate" title="${file.name}">${file.name}</div>
+                    <div class="text-xs text-gray-500">${sizeMB} MB</div>
+                </div>
+                `;
+            }).join('');
+
+            // Adicionar event listeners para remover arquivos
+            preview.querySelectorAll('.remove-file').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    filesToUpload.splice(index, 1);
+                    atualizarPreviewUpload();
+                    if (filesToUpload.length === 0) {
+                        document.getElementById('start-upload').disabled = true;
+                    }
+                });
+            });
+        }
+
+        async function iniciarUpload() {
+            if (filesToUpload.length === 0) return;
+
+            const startUploadBtn = document.getElementById('start-upload');
+            const progressContainer = document.getElementById('upload-progress-container');
+            const overallProgressBar = document.getElementById('overall-progress-bar');
+            const overallProgressText = document.getElementById('overall-progress-text');
+            const fileList = document.getElementById('upload-file-list');
+
+            // Preparar interface
+            startUploadBtn.disabled = true;
+            startUploadBtn.innerHTML = '<div class="loading-spinner"></div> Enviando...';
+            progressContainer.classList.remove('hidden');
+
+            // Obter configurações
+            const categoria = document.getElementById('upload-category').value;
+            const tagsInput = document.getElementById('upload-tags').value;
+            const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+
+            // Configurar lista de arquivos
+            fileList.innerHTML = filesToUpload.map((file, index) => `
+                <div class="flex items-center justify-between text-sm" data-file-index="${index}">
+                    <span class="truncate flex-1">${file.name}</span>
+                    <span class="file-size text-gray-500 mx-2">${formatFileSize(file.size)}</span>
+                    <span class="file-status text-gray-500">Aguardando...</span>
+                    <div class="file-progress w-16 bg-gray-200 rounded-full h-2 ml-2">
+                        <div class="bg-[--cor-ouro-acento] h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            let uploadedCount = 0;
+            let successfulUploads = 0;
+
+            // Fazer upload de cada arquivo
+            for (let i = 0; i < filesToUpload.length; i++) {
+                const file = filesToUpload[i];
+                const fileElement = fileList.querySelector(`[data-file-index="${i}"]`);
+                const statusElement = fileElement.querySelector('.file-status');
+                const progressElement = fileElement.querySelector('.file-progress > div');
+
+                try {
+                    statusElement.textContent = 'Enviando...';
+                    statusElement.className = 'file-status text-blue-600';
+
+                    // Fazer upload para o Storage
+                    const fileName = `galeria/${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+                    const storageRef = ref(storage, fileName);
+                    const uploadTask = uploadBytesResumable(storageRef, file);
+
+                    await new Promise((resolve, reject) => {
+                        uploadTask.on('state_changed',
+                            (snapshot) => {
+                                // Progresso individual
+                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                progressElement.style.width = `${progress}%`;
+
+                                // Progresso geral
+                                const overallProgress = ((uploadedCount + (progress / 100)) / filesToUpload.length) * 100;
+                                overallProgressBar.style.width = `${overallProgress}%`;
+                                overallProgressText.textContent = `${Math.round(overallProgress)}%`;
+                            },
+                            (error) => {
+                                reject(error);
+                            },
+                            async () => {
+                                // Upload completo - salvar no Firestore
+                                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                                
+                                const imageData = {
+                                    url: downloadURL,
+                                    path: fileName, // Salvar o caminho para exclusão futura
+                                    nomeArquivo: file.name,
+                                    tamanho: file.size,
+                                    dataUpload: new Date(),
+                                    tags: tags,
+                                    categoria: categoria,
+                                    utilizadaEm: [],
+                                    status: 'active',
+                                    isExternal: false
+                                };
+
+                                await addDoc(collection(db, "galeria"), imageData);
+                                
+                                uploadedCount++;
+                                successfulUploads++;
+                                statusElement.textContent = 'Concluído ✓';
+                                statusElement.className = 'file-status text-green-600';
+                                resolve();
+                            }
+                        );
+                    });
+
+                } catch (error) {
+                    console.error(`Erro no upload de ${file.name}:`, error);
+                    uploadedCount++;
+                    statusElement.textContent = 'Erro ✗';
+                    statusElement.className = 'file-status text-red-600';
+                    mostrarToast(`Erro ao fazer upload de ${file.name}`, "error");
+                }
+            }
+
+            // Finalizar
+            if (successfulUploads > 0) {
+                mostrarToast(`${successfulUploads} imagem(ns) carregada(s) com sucesso!`);
+            }
+
+            // Fechar modal após um tempo
+            setTimeout(() => {
+                elementos.uploadModal.classList.remove('visivel');
+                resetUploadModal();
+            }, 2000);
+        }
+
+        function resetUploadModal() {
+            filesToUpload = [];
+            document.getElementById('file-input').value = '';
+            document.getElementById('upload-tags').value = '';
+            document.getElementById('upload-category').value = 'produtos';
+            document.getElementById('start-upload').disabled = true;
+            document.getElementById('start-upload-text').textContent = 'Iniciar Upload';
+            document.getElementById('upload-progress-container').classList.add('hidden');
+            document.getElementById('overall-progress-bar').style.width = '0%';
+            document.getElementById('overall-progress-text').textContent = '0%';
+            atualizarPreviewUpload();
+        }
+
+        // ===================================
+        // SISTEMA DE ADICIONAR POR URL
+        // ===================================
+        function setupUrlModal() {
+            const urlModal = document.getElementById('add-url-modal');
+            const urlInput = document.getElementById('image-url');
+            const previewContainer = document.getElementById('url-preview');
+            
+            // Preview automático da URL
+            urlInput.addEventListener('input', debounce((e) => {
+                const url = e.target.value;
+                if (url && isValidUrl(url)) {
+                    previewContainer.innerHTML = `
+                        <img src="${url}" class="max-w-full max-h-48 object-contain" 
+                             onerror="this.parentElement.innerHTML='<p class=\\'text-red-500 text-sm\\'>Erro ao carregar imagem</p>'">
+                    `;
+                }
+            }, 500));
+
+            // Fechar modal
+            document.getElementById('close-add-url-modal').addEventListener('click', () => {
+                urlModal.classList.remove('visivel');
+            });
+
+            document.getElementById('cancel-add-url').addEventListener('click', () => {
+                urlModal.classList.remove('visivel');
+            });
+
+            // Submeter formulário
+            document.getElementById('add-url-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await adicionarImagemPorURL();
+            });
+        }
+
+        // Validar URL
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Adicionar imagem por URL
+        async function adicionarImagemPorURL() {
+            const url = document.getElementById('image-url').value;
+            const nome = document.getElementById('url-image-name').value;
+            const categoria = document.getElementById('url-category').value;
+            const tagsInput = document.getElementById('url-tags').value;
+            const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+
+            if (!url || !nome) {
+                mostrarToast("Preencha a URL e o nome da imagem.", "error");
+                return;
+            }
+
+            if (!isValidUrl(url)) {
+                mostrarToast("URL inválida.", "error");
+                return;
+            }
+
+            try {
+                const imageData = {
+                    url: url,
+                    nomeArquivo: nome,
+                    tamanho: 0, // Não sabemos o tamanho de imagens externas
+                    dataUpload: new Date(),
+                    tags: tags,
+                    categoria: categoria,
+                    utilizadaEm: [],
+                    status: 'active',
+                    isExternal: true // Marcar como imagem externa
+                };
+
+                await addDoc(collection(db, "galeria"), imageData);
+                mostrarToast("Imagem adicionada com sucesso!");
+                document.getElementById('add-url-modal').classList.remove('visivel');
+                document.getElementById('add-url-form').reset();
+                document.getElementById('url-preview').innerHTML = '<p class="text-gray-500 text-sm">A pré-visualização aparecerá aqui</p>';
+                
+            } catch (error) {
+                console.error("Erro ao adicionar imagem por URL:", error);
+                mostrarToast("Erro ao adicionar imagem", "error");
+            }
+        }
+
+        // Abrir modal de URL
+        function abrirModalUrl() {
+            document.getElementById('add-url-modal').classList.add('visivel');
+        }
+
+        // ===================================
+        // MODAL DE EDIÇÃO
+        // ===================================
+        function abrirModalEdicao(imageId) {
+            const imagem = galeriaImagens.find(img => img.id === imageId);
+            if (!imagem) return;
+
+            currentEditImageId = imageId;
+
+            // Preencher formulário
+            document.getElementById('edit-image-id').value = imagem.id;
+            document.getElementById('edit-image-name').value = imagem.nomeArquivo || '';
+            document.getElementById('edit-image-category').value = imagem.categoria || 'outras';
+            document.getElementById('edit-image-preview').src = imagem.url;
+            document.getElementById('edit-filename').textContent = imagem.nomeArquivo || '-';
+            document.getElementById('edit-filesize').textContent = formatFileSize(imagem.tamanho || 0);
+            document.getElementById('edit-upload-date').textContent = imagem.dataUpload ? 
+                new Date(imagem.dataUpload.seconds * 1000).toLocaleString('pt-BR') : '-';
+            document.getElementById('edit-image-url').textContent = imagem.url || '-';
+            document.getElementById('edit-image-db-id').textContent = imagem.id || '-';
+            document.getElementById('edit-image-status').textContent = imagem.status || 'active';
+            document.getElementById('edit-last-updated').textContent = imagem.updatedAt ? 
+                new Date(imagem.updatedAt.seconds * 1000).toLocaleString('pt-BR') : '-';
+
+            // Dimensões da imagem
+            const img = new Image();
+            img.onload = function() {
+                document.getElementById('edit-dimensions').textContent = `${this.width} × ${this.height} px`;
+            };
+            img.src = imagem.url;
+
+            // Tags
+            renderizarTagsEdicao(imagem.tags || []);
+
+            // Produtos associados
+            renderizarProdutosAssociados(imagem.utilizadaEm || []);
+
+            // Mostrar modal
+            elementos.editImageModal.classList.add('visivel');
+
+            // Configurar event listeners do modal de edição
+            setupEditModalListeners();
+        }
+
+        function renderizarTagsEdicao(tags) {
+            const container = document.getElementById('edit-tags-container');
+            container.innerHTML = tags.map(tag => `
+                <span class="tag">
+                    ${tag}
+                    <span class="tag-remove" data-tag="${tag}">×</span>
+                </span>
+            `).join('');
+        }
+
+        function renderizarProdutosAssociados(produtosIds) {
+            const container = document.getElementById('edit-associated-products');
+            
+            if (produtosIds.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-4">
+                        <i class="fa-solid fa-shirt text-xl mb-2 opacity-50"></i>
+                        <p class="text-sm">Nenhum produto associado</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const produtosAssociados = produtos.filter(prod => produtosIds.includes(prod.id));
+            container.innerHTML = produtosAssociados.map(prod => `
+                <div class="flex items-center gap-2 mb-2 last:mb-0">
+                    <div class="w-8 h-8 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                        <img src="${prod.imagens && prod.imagens[0] ? prod.imagens[0] : 'https://placehold.co/100x100/eeeeee/cccccc?text=Sem+Imagem'}" 
+                             alt="${prod.nome}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${prod.nome}</p>
+                        <p class="text-xs text-gray-600">R$ ${parseFloat(prod.preco || 0).toFixed(2)}</p>
+                    </div>
+                    <a href="produtos.html" class="text-xs text-[--cor-marrom-cta] hover:underline" target="_blank">
+                        Ver
+                    </a>
+                </div>
+            `).join('');
+        }
+
+        function setupEditModalListeners() {
+            // Adicionar tag
+            document.getElementById('edit-add-tag').addEventListener('click', () => {
+                const newTagInput = document.getElementById('edit-new-tag');
+                const newTag = newTagInput.value.trim();
+                
+                if (newTag) {
+                    const tagsContainer = document.getElementById('edit-tags-container');
+                    tagsContainer.innerHTML += `
+                        <span class="tag">
+                            ${newTag}
+                            <span class="tag-remove" data-tag="${newTag}">×</span>
+                        </span>
+                    `;
+                    newTagInput.value = '';
+                }
+            });
+
+            // Remover tag
+            document.getElementById('edit-tags-container').addEventListener('click', (e) => {
+                if (e.target.classList.contains('tag-remove')) {
+                    e.target.parentElement.remove();
+                }
+            });
+
+            // Salvar alterações
+            document.getElementById('edit-image-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await salvarAlteracoesImagem();
+            });
+
+            // Excluir imagem
+            document.getElementById('delete-image-btn').addEventListener('click', () => {
+                confirmarExclusao(currentEditImageId);
+            });
+
+            // Fechar modal
+            document.getElementById('close-edit-modal').addEventListener('click', () => {
+                elementos.editImageModal.classList.remove('visivel');
+            });
+
+            document.getElementById('cancel-edit').addEventListener('click', () => {
+                elementos.editImageModal.classList.remove('visivel');
+            });
+        }
+
+        async function salvarAlteracoesImagem() {
+            const imageId = document.getElementById('edit-image-id').value;
+            const nome = document.getElementById('edit-image-name').value;
+            const categoria = document.getElementById('edit-image-category').value;
+            
+            // Obter tags do container
+            const tagsContainer = document.getElementById('edit-tags-container');
+            const tags = Array.from(tagsContainer.querySelectorAll('.tag')).map(tag => 
+                tag.textContent.replace('×', '').trim()
+            );
+
+            try {
+                const imageRef = doc(db, "galeria", imageId);
+                await updateDoc(imageRef, {
+                    nomeArquivo: nome,
+                    categoria: categoria,
+                    tags: tags,
+                    updatedAt: new Date()
+                });
+
+                mostrarToast("Imagem atualizada com sucesso!");
+                elementos.editImageModal.classList.remove('visivel');
+                
+            } catch (error) {
+                console.error("Erro ao atualizar imagem:", error);
+                mostrarToast("Erro ao atualizar imagem", "error");
+            }
+        }
+
+        // ===================================
+        // EXCLUSÃO DE IMAGENS
+        // ===================================
+        function confirmarExclusao(imageId) {
+            const imagem = galeriaImagens.find(img => img.id === imageId);
+            if (!imagem) return;
+
+            // Verificar se a imagem está em uso
+            const usageCount = imagem.utilizadaEm ? imagem.utilizadaEm.length : 0;
+            
+            let message = "Tem certeza que deseja excluir esta imagem?";
+            if (usageCount > 0) {
+                message += `\n\nATENÇÃO: Esta imagem está sendo usada em ${usageCount} produto(s). A exclusão pode afetar a exibição desses produtos.`;
+            }
+            message += "\n\nEsta ação não pode ser desfeita e removerá a imagem do Storage.";
+
+            document.getElementById('delete-confirm-message').textContent = message;
+            document.getElementById('delete-confirm-title').textContent = `Excluir "${imagem.nomeArquivo}"`;
+
+            // Configurar event listeners
+            document.getElementById('confirm-delete').onclick = () => excluirImagem(imageId);
+            document.getElementById('cancel-delete').onclick = () => elementos.deleteConfirmModal.classList.remove('visivel');
+
+            elementos.deleteConfirmModal.classList.add('visivel');
+        }
+
+        async function excluirImagem(imageId) {
+            const imagem = galeriaImagens.find(img => img.id === imageId);
+            if (!imagem) return;
+
+            try {
+                // Se não for imagem externa, excluir do Storage usando o path salvo
+                if (!imagem.isExternal && imagem.path) {
+                    const storageRef = ref(storage, imagem.path);
+                    await deleteObject(storageRef);
+                }
+                
+                // Excluir do Firestore
+                await deleteDoc(doc(db, "galeria", imageId));
+
+                mostrarToast("Imagem excluída com sucesso!");
+                elementos.deleteConfirmModal.classList.remove('visivel');
+                elementos.editImageModal.classList.remove('visivel');
+                
+            } catch (error) {
+                console.error("Erro ao excluir imagem:", error);
+                mostrarToast("Erro ao excluir imagem", "error");
+            }
+        }
+
+        // ===================================
+        // FUNÇÕES UTILITÁRIAS AVANÇADAS
+        // ===================================
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function abrirModalUpload() {
+            elementos.uploadModal.classList.add('visivel');
+        }
+
+        // Inicializar quando o DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

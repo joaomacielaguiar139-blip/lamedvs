@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Coleções | Painel Administrativo - Laméd vs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Allura&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cor-fundo: #FFFFFF;
+            --cor-texto: #1F2937;
+            --cor-marrom-cta: #643f21;
+            --cor-ouro-acento: #A58A5C;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--cor-texto);
+            background-color: #f8fafc;
+        }
+        
+        .font-allura { font-family: 'Allura', cursive; }
+
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-primary {
+            background-color: var(--cor-marrom-cta);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #5a3d2b;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: var(--cor-texto);
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .modal {
+            visibility: hidden;
+            opacity: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 50;
+        }
+        .modal.visivel {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            width: 90%;
+            max-width: 64rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .modal.visivel .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .collection-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .collection-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .collection-card.active {
+            border-color: var(--cor-ouro-acento);
+            background-color: #fefce8;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-inactive {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--cor-ouro-acento), #d4af37);
+            color: white;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f4f6;
+            border-radius: 50%;
+            border-top-color: #a58a5c;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="dashboard.html" class="font-allura text-4xl text-[--cor-texto]">
+                        Laméd vs
+                    </a>
+                    <span class="ml-4 text-lg text-gray-500 font-medium">Gestão de Coleções</span>
+                </div>
+                
+                <!-- Menu de Navegação -->
+                <nav class="hidden md:flex items-center gap-6">
+                    <a href="dashboard.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                        <i class="fa-solid fa-chart-line mr-2"></i>Dashboard
+                    </a>
+                    <a href="produtos.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                        <i class="fa-solid fa-shirt mr-2"></i>Produtos
+                    </a>
+                    <a href="galeria.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                        <i class="fa-solid fa-images mr-2"></i>Galeria
+                    </a>
+                    <a href="pedidos.html" class="text-gray-700 hover:text-[--cor-marrom-cta] font-medium">
+                        <i class="fa-solid fa-shopping-bag mr-2"></i>Pedidos
+                    </a>
+                </nav>
+
+                <!-- Botões de Ação -->
+                <div class="flex items-center gap-4">
+                    <button id="add-collection-btn" class="btn-primary px-4 py-2 text-sm">
+                        <i class="fa-solid fa-plus mr-2"></i>Nova Coleção
+                    </button>
+                    <button id="logout-button" class="text-gray-600 hover:text-gray-900 text-sm" title="Sair">
+                        Sair <i class="fa-solid fa-arrow-right-from-bracket ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Cabeçalho e Estatísticas -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-800">Gestão de Coleções</h1>
+                <p class="text-gray-600">Organize suas coleções e defina a coleção ativa</p>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 items-center">
+                <!-- Estatísticas Rápidas -->
+                <div class="flex gap-6 text-sm">
+                    <div class="text-center">
+                        <div class="font-semibold text-[--cor-marrom-cta]" id="total-collections">0</div>
+                        <div class="text-gray-500">Total</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-green-600" id="active-collections">0</div>
+                        <div class="text-gray-500">Ativas</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-blue-600" id="products-in-collections">0</div>
+                        <div class="text-gray-500">Produtos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coleção Atual -->
+        <div id="current-collection-section" class="card p-6 mb-8 bg-gradient-to-r from-[--cor-ouro-acento] to-amber-600 text-white hidden">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i class="fa-solid fa-crown text-2xl"></i>
+                        <h2 class="text-xl font-bold">Coleção Atual</h2>
+                    </div>
+                    <h3 id="current-collection-name" class="text-2xl font-light mb-2"></h3>
+                    <p id="current-collection-description" class="text-amber-100 mb-4"></p>
+                    <div class="flex gap-4 text-sm">
+                        <div>
+                            <span class="font-semibold">Lançamento:</span>
+                            <span id="current-collection-date" class="ml-1"></span>
+                        </div>
+                        <div>
+                            <span class="font-semibold">Produtos:</span>
+                            <span id="current-collection-products" class="ml-1">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 lg:mt-0">
+                    <button id="manage-current-collection" class="bg-white text-[--cor-marrom-cta] px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                        <i class="fa-solid fa-edit mr-2"></i>Gerenciar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de Coleções -->
+        <div class="card p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-800">Todas as Coleções</h3>
+                
+                <div class="flex items-center gap-4">
+                    <!-- Ordenação -->
+                    <select id="sort-select" class="text-sm border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-1 focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento] bg-white">
+                        <option value="order-asc">Ordem (Menor-Maior)</option>
+                        <option value="date-desc">Mais Recentes</option>
+                        <option value="date-asc">Mais Antigas</option>
+                        <option value="name-asc">Nome (A-Z)</option>
+                        <option value="name-desc">Nome (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="text-center py-10">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[--cor-ouro-acento]"></div>
+                <p class="text-gray-600 mt-2">Carregando coleções...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="text-center py-10 hidden">
+                <i class="fa-solid fa-layer-group text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-600">Nenhuma coleção encontrada.</p>
+                <p class="text-sm text-gray-500 mt-2">Crie sua primeira coleção para começar.</p>
+                <button id="empty-add-btn" class="btn-primary mt-4 px-4 py-2">
+                    <i class="fa-solid fa-plus mr-2"></i>Criar Primeira Coleção
+                </button>
+            </div>
+
+            <!-- Grid de Coleções -->
+            <div id="collections-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Coleções serão carregadas aqui -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Coleção -->
+    <div id="collection-modal" class="modal">
+        <div class="modal-content">
+            <!-- Cabeçalho do Modal -->
+            <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                <h2 id="modal-title" class="text-2xl font-semibold text-gray-800">Nova Coleção</h2>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            </div>
+
+            <!-- Formulário -->
+            <form id="collection-form" class="space-y-6">
+                <input type="hidden" id="collection-id">
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Coluna 1: Informações Básicas -->
+                    <div class="space-y-6">
+                        <!-- Nome -->
+                        <div>
+                            <label for="collection-name" class="block text-sm font-medium text-gray-700 mb-2">Nome da Coleção *</label>
+                            <input type="text" id="collection-name" required 
+                                   class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]">
+                        </div>
+
+                        <!-- Slug -->
+                        <div>
+                            <label for="collection-slug" class="block text-sm font-medium text-gray-700 mb-2">Slug (URL) *</label>
+                            <input type="text" id="collection-slug" required 
+                                   class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]">
+                            <p class="text-xs text-gray-500 mt-1">Identificador único para URLs (ex: minha-colecao-verao)</p>
+                        </div>
+
+                        <!-- Data de Lançamento -->
+                        <div>
+                            <label for="collection-date" class="block text-sm font-medium text-gray-700 mb-2">Data de Lançamento</label>
+                            <input type="date" id="collection-date" 
+                                   class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]">
+                        </div>
+                    </div>
+
+                    <!-- Coluna 2: Configurações -->
+                    <div class="space-y-6">
+                        <!-- Descrição -->
+                        <div>
+                            <label for="collection-description" class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                            <textarea id="collection-description" rows="4" 
+                                      class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]"></textarea>
+                        </div>
+
+                        <!-- Ordem -->
+                        <div>
+                            <label for="collection-order" class="block text-sm font-medium text-gray-700 mb-2">Ordem de Exibição</label>
+                            <input type="number" id="collection-order" min="0" value="0" 
+                                   class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]">
+                            <p class="text-xs text-gray-500 mt-1">Número para ordenação (menor número aparece primeiro)</p>
+                        </div>
+
+                        <!-- Status Ativa -->
+                        <div class="flex items-center">
+                            <input type="checkbox" id="collection-active" 
+                                   class="w-4 h-4 text-[--cor-ouro-acento] border-gray-300 rounded focus:ring-[--cor-ouro-acento]">
+                            <label for="collection-active" class="ml-2 text-sm text-gray-700">Definir como coleção ativa</label>
+                        </div>
+
+                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p class="text-sm text-blue-800">
+                                <i class="fa-solid fa-info-circle mr-2"></i>
+                                <strong>Atenção:</strong> Ao marcar esta opção, a coleção atual será desativada automaticamente.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Imagem de Destaque -->
+                <div class="border-t pt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Imagem de Destaque</label>
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <input type="url" id="collection-image" placeholder="https://..." 
+                                   class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[--cor-ouro-acento] focus:border-[--cor-ouro-acento]">
+                            <p class="text-xs text-gray-500 mt-1">URL da imagem de capa da coleção</p>
+                        </div>
+                        <button type="button" id="browse-gallery" class="btn-secondary px-4 py-2 whitespace-nowrap">
+                            <i class="fa-solid fa-images mr-2"></i>Galeria
+                        </button>
+                    </div>
+                    
+                    <!-- Preview da Imagem -->
+                    <div id="image-preview" class="mt-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Preview</label>
+                        <div class="w-32 h-32 border border-gray-300 rounded-lg overflow-hidden">
+                            <img id="preview-image" src="" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="flex justify-between items-center pt-6 border-t">
+                    <div>
+                        <button type="button" id="delete-collection-btn" class="btn-danger px-4 py-2 hidden">
+                            <i class="fa-solid fa-trash mr-2"></i>Excluir Coleção
+                        </button>
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <button type="button" id="cancel-modal" class="btn-secondary px-4 py-2">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="save-collection-btn" class="btn-primary px-4 py-2">
+                            <i class="fa-solid fa-save mr-2"></i>
+                            <span id="save-button-text">Salvar Coleção</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content max-w-md">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
+                    <i class="fa-solid fa-exclamation-triangle text-yellow-600 text-xl"></i>
+                </div>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-2" id="confirm-title">Confirmar Ação</h3>
+                <p class="text-sm text-gray-500 mb-6" id="confirm-message">
+                    Tem certeza que deseja realizar esta ação?
+                </p>
+                
+                <div class="flex gap-3 justify-center">
+                    <button id="cancel-confirm" class="btn-secondary px-6 py-2">
+                        Cancelar
+                    </button>
+                    <button id="proceed-confirm" class="btn-primary px-6 py-2">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="hidden fixed bottom-10 right-10 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 z-50">
+        <span id="toast-message">Ação realizada com sucesso!</span>
+    </div>
+
+    <!-- Scripts Firebase -->
+    <script type="module">
+        // ===================================
+        // CONFIGURAÇÃO FIREBASE
+        // ===================================
+        
+        const firebaseConfig = {
+          apiKey: "AIzaSyCzB4_YotWCPVh1yaqWkhbB4LypPQYvV4U",
+          authDomain: "site-lamed.firebaseapp.com",
+          databaseURL: "https://site-lamed-default-rtdb.firebaseio.com",
+          projectId: "site-lamed",
+          storageBucket: "site-lamed.firebasestorage.app",
+          messagingSenderId: "862756160215",
+          appId: "1:862756160215:web:d0fded233682bf93eaa692",
+          measurementId: "G-BL1G961PGT"
+        };
+        
+        // Importações do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { 
+            getAuth, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            onSnapshot,
+            addDoc, 
+            doc, 
+            updateDoc, 
+            deleteDoc, 
+            query,
+            where,
+            orderBy,
+            getDocs,
+            writeBatch
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Inicialização dos Serviços
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (error) {
+            console.error("Erro fatal ao inicializar o Firebase:", error);
+            mostrarToast("Erro de configuração do Firebase", "error");
+        }
+
+        // ===================================
+        // VARIÁVEIS GLOBAIS
+        // ===================================
+        let colecoes = [];
+        let produtos = [];
+        let currentCollectionId = null;
+
+        // ===================================
+        // ELEMENTOS DOM
+        // ===================================
+        const elementos = {
+            // Botões principais
+            addCollectionBtn: document.getElementById('add-collection-btn'),
+            logoutButton: document.getElementById('logout-button'),
+            emptyAddBtn: document.getElementById('empty-add-btn'),
+
+            // Estatísticas
+            totalCollections: document.getElementById('total-collections'),
+            activeCollections: document.getElementById('active-collections'),
+            productsInCollections: document.getElementById('products-in-collections'),
+
+            // Coleção Atual
+            currentCollectionSection: document.getElementById('current-collection-section'),
+            currentCollectionName: document.getElementById('current-collection-name'),
+            currentCollectionDescription: document.getElementById('current-collection-description'),
+            currentCollectionDate: document.getElementById('current-collection-date'),
+            currentCollectionProducts: document.getElementById('current-collection-products'),
+            manageCurrentCollection: document.getElementById('manage-current-collection'),
+
+            // Estados
+            loadingState: document.getElementById('loading-state'),
+            emptyState: document.getElementById('empty-state'),
+            collectionsGrid: document.getElementById('collections-grid'),
+
+            // Ordenação
+            sortSelect: document.getElementById('sort-select'),
+
+            // Modais
+            collectionModal: document.getElementById('collection-modal'),
+            confirmModal: document.getElementById('confirm-modal')
+        };
+
+        // ===================================
+        // INICIALIZAÇÃO
+        // ===================================
+        function init() {
+            console.log("Iniciando gestão de coleções...");
+            
+            // Verificar autenticação
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    window.location.href = './login-admin.html';
+                } else {
+                    carregarDados();
+                    setupEventListeners();
+                }
+            });
+        }
+
+        // Carregar todos os dados necessários
+        async function carregarDados() {
+            try {
+                elementos.loadingState.classList.remove('hidden');
+                elementos.emptyState.classList.add('hidden');
+
+                await Promise.all([
+                    carregarColecoes(),
+                    carregarProdutos()
+                ]);
+
+                aplicarOrdenacao();
+                atualizarEstatisticas();
+                atualizarColecaoAtual();
+                
+            } catch (error) {
+                console.error("Erro ao carregar dados:", error);
+                mostrarToast("Erro ao carregar dados", "error");
+            } finally {
+                elementos.loadingState.classList.add('hidden');
+            }
+        }
+
+        // ===================================
+        // CARREGAMENTO DE DADOS
+        // ===================================
+        async function carregarColecoes() {
+            return new Promise((resolve, reject) => {
+                const q = query(collection(db, "colecoes"), orderBy("ordem", "asc"));
+                
+                onSnapshot(q, (snapshot) => {
+                    colecoes = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data(),
+                        // Garantir campos padrão
+                        ordem: doc.data().ordem || 0,
+                        ativa: doc.data().ativa || false,
+                        createdAt: doc.data().createdAt || null,
+                        updatedAt: doc.data().updatedAt || null
+                    }));
+                    
+                    renderizarColecoes();
+                    resolve();
+                }, reject);
+            });
+        }
+
+        async function carregarProdutos() {
+            try {
+                const snapshot = await getDocs(collection(db, "pecas"));
+                produtos = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+            } catch (error) {
+                console.log("Erro ao carregar produtos:", error);
+                produtos = [];
+            }
+        }
+
+        // ===================================
+        // RENDERIZAÇÃO
+        // ===================================
+        function renderizarColecoes() {
+            if (colecoes.length === 0) {
+                elementos.emptyState.classList.remove('hidden');
+                elementos.collectionsGrid.innerHTML = '';
+                return;
+            }
+
+            elementos.emptyState.classList.add('hidden');
+
+            elementos.collectionsGrid.innerHTML = colecoes.map(colecao => {
+                const produtosNaColecao = produtos.filter(prod => prod.colecaoId === colecao.id).length;
+                const dataLancamento = colecao.dataLancamento ? 
+                    new Date(colecao.dataLancamento.seconds * 1000).toLocaleDateString('pt-BR') : 'Não definida';
+                
+                return `
+                <div class="collection-card card p-6 ${colecao.ativa ? 'active' : ''}" data-collection-id="${colecao.id}">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">${colecao.nome}</h3>
+                            <span class="status-badge ${colecao.ativa ? 'status-active' : 'status-inactive'}">
+                                ${colecao.ativa ? 'Ativa' : 'Inativa'}
+                            </span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-2xl font-bold text-[--cor-marrom-cta]">${produtosNaColecao}</span>
+                            <p class="text-sm text-gray-500">produtos</p>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">${colecao.descricao || 'Sem descrição'}</p>
+                    
+                    <div class="space-y-2 text-sm text-gray-500 mb-4">
+                        <div class="flex justify-between">
+                            <span>Lançamento:</span>
+                            <span>${dataLancamento}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Ordem:</span>
+                            <span>${colecao.ordem}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-4 border-t border-gray-200">
+                        ${!colecao.ativa ? `
+                            <button class="set-active-btn flex-1 text-center text-sm bg-green-50 text-green-700 py-2 rounded hover:bg-green-100 transition-colors" 
+                                    data-collection-id="${colecao.id}">
+                                <i class="fa-solid fa-check mr-1"></i>Ativar
+                            </button>
+                        ` : ''}
+                        <button class="edit-collection flex-1 text-center text-sm bg-blue-50 text-blue-700 py-2 rounded hover:bg-blue-100 transition-colors" 
+                                data-collection-id="${colecao.id}">
+                            <i class="fa-solid fa-pen mr-1"></i>Editar
+                        </button>
+                        ${!colecao.ativa ? `
+                            <button class="delete-collection text-sm bg-red-50 text-red-700 p-2 rounded hover:bg-red-100 transition-colors" 
+                                    data-collection-id="${colecao.id}">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // ===================================
+        // FUNÇÕES UTILITÁRIAS
+        // ===================================
+        function atualizarEstatisticas() {
+            elementos.totalCollections.textContent = colecoes.length;
+            elementos.activeCollections.textContent = colecoes.filter(c => c.ativa).length;
+            
+            // Contar produtos em coleções
+            const produtosEmColecoes = produtos.filter(prod => prod.colecaoId).length;
+            elementos.productsInCollections.textContent = produtosEmColecoes;
+        }
+
+        function atualizarColecaoAtual() {
+            const colecaoAtiva = colecoes.find(c => c.ativa);
+            
+            if (colecaoAtiva) {
+                elementos.currentCollectionSection.classList.remove('hidden');
+                elementos.currentCollectionName.textContent = colecaoAtiva.nome;
+                elementos.currentCollectionDescription.textContent = colecaoAtiva.descricao || '';
+                
+                const dataLancamento = colecaoAtiva.dataLancamento ? 
+                    new Date(colecaoAtiva.dataLancamento.seconds * 1000).toLocaleDateString('pt-BR') : 'Não definida';
+                elementos.currentCollectionDate.textContent = dataLancamento;
+                
+                const produtosNaColecao = produtos.filter(prod => prod.colecaoId === colecaoAtiva.id).length;
+                elementos.currentCollectionProducts.textContent = produtosNaColecao;
+                
+                elementos.manageCurrentCollection.onclick = () => abrirModalEdicao(colecaoAtiva.id);
+            } else {
+                elementos.currentCollectionSection.classList.add('hidden');
+            }
+        }
+
+        function aplicarOrdenacao() {
+            const ordenacao = elementos.sortSelect.value;
+            colecoes.sort((a, b) => {
+                switch (ordenacao) {
+                    case 'order-asc': return (a.ordem || 0) - (b.ordem || 0);
+                    case 'date-desc': return new Date(b.createdAt?.seconds * 1000 || 0) - new Date(a.createdAt?.seconds * 1000 || 0);
+                    case 'date-asc': return new Date(a.createdAt?.seconds * 1000 || 0) - new Date(b.createdAt?.seconds * 1000 || 0);
+                    case 'name-asc': return (a.nome || '').localeCompare(b.nome || '');
+                    case 'name-desc': return (b.nome || '').localeCompare(a.nome || '');
+                    default: return 0;
+                }
+            });
+            renderizarColecoes();
+        }
+
+        function mostrarToast(message, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.className = `fixed bottom-10 right-10 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 z-50 ${
+                type === "error" ? "bg-red-600" : "bg-green-600"
+            } text-white`;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        function slugify(text) {
+            return text
+                .toString()
+                .toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w\-]+/g, '')
+                .replace(/\-\-+/g, '-')
+                .replace(/^-+/, '')
+                .replace(/-+$/, '');
+        }
+
+        // ===================================
+        // MODAL DE COLEÇÃO
+        // ===================================
+        function abrirModalCriacao() {
+            resetModalColecao();
+            document.getElementById('modal-title').textContent = 'Nova Coleção';
+            document.getElementById('delete-collection-btn').classList.add('hidden');
+            elementos.collectionModal.classList.add('visivel');
+        }
+
+        function abrirModalEdicao(collectionId) {
+            const colecao = colecoes.find(c => c.id === collectionId);
+            if (!colecao) return;
+
+            resetModalColecao();
+            preencherFormularioColecao(colecao);
+            document.getElementById('modal-title').textContent = 'Editar Coleção';
+            document.getElementById('delete-collection-btn').classList.remove('hidden');
+            elementos.collectionModal.classList.add('visivel');
+        }
+
+        function resetModalColecao() {
+            document.getElementById('collection-form').reset();
+            document.getElementById('collection-id').value = '';
+            document.getElementById('collection-order').value = '0';
+            document.getElementById('collection-active').checked = false;
+            document.getElementById('image-preview').classList.add('hidden');
+            currentCollectionId = null;
+        }
+
+        function preencherFormularioColecao(colecao) {
+            document.getElementById('collection-id').value = colecao.id;
+            document.getElementById('collection-name').value = colecao.nome || '';
+            document.getElementById('collection-slug').value = colecao.slug || '';
+            document.getElementById('collection-description').value = colecao.descricao || '';
+            document.getElementById('collection-order').value = colecao.ordem || 0;
+            document.getElementById('collection-active').checked = colecao.ativa || false;
+            document.getElementById('collection-image').value = colecao.imagemDestaque || '';
+
+            if (colecao.dataLancamento) {
+                const data = new Date(colecao.dataLancamento.seconds * 1000);
+                document.getElementById('collection-date').value = data.toISOString().split('T')[0];
+            }
+
+            // Preview da imagem
+            if (colecao.imagemDestaque) {
+                document.getElementById('preview-image').src = colecao.imagemDestaque;
+                document.getElementById('image-preview').classList.remove('hidden');
+            }
+
+            currentCollectionId = colecao.id;
+        }
+
+        async function salvarColecao() {
+            const form = document.getElementById('collection-form');
+            const formData = new FormData(form);
+            
+            const collectionData = {
+                nome: document.getElementById('collection-name').value.trim(),
+                slug: document.getElementById('collection-slug').value.trim(),
+                descricao: document.getElementById('collection-description').value.trim(),
+                ordem: parseInt(document.getElementById('collection-order').value) || 0,
+                imagemDestaque: document.getElementById('collection-image').value.trim(),
+                updatedAt: new Date()
+            };
+
+            // Data de lançamento
+            const dataLancamento = document.getElementById('collection-date').value;
+            if (dataLancamento) {
+                collectionData.dataLancamento = new Date(dataLancamento);
+            }
+
+            // Verificar se é para definir como ativa
+            const definirComoAtiva = document.getElementById('collection-active').checked;
+
+            try {
+                const id = document.getElementById('collection-id').value;
+
+                if (definirComoAtiva) {
+                    // Desativar todas as outras coleções
+                    const batch = writeBatch(db);
+                    colecoes.forEach(colecao => {
+                        if (colecao.ativa) {
+                            const colecaoRef = doc(db, "colecoes", colecao.id);
+                            batch.update(colecaoRef, { ativa: false });
+                        }
+                    });
+                    await batch.commit();
+                    collectionData.ativa = true;
+                }
+
+                if (id) {
+                    // Atualizar
+                    const colecaoRef = doc(db, "colecoes", id);
+                    await updateDoc(colecaoRef, collectionData);
+                    mostrarToast("Coleção atualizada com sucesso!");
+                } else {
+                    // Criar
+                    collectionData.createdAt = new Date();
+                    collectionData.ativa = definirComoAtiva;
+                    await addDoc(collection(db, "colecoes"), collectionData);
+                    mostrarToast("Coleção criada com sucesso!");
+                }
+
+                elementos.collectionModal.classList.remove('visivel');
+
+            } catch (error) {
+                console.error("Erro ao salvar coleção:", error);
+                mostrarToast("Erro ao salvar coleção", "error");
+            }
+        }
+
+        async function definirComoAtiva(collectionId) {
+            const colecao = colecoes.find(c => c.id === collectionId);
+            if (!colecao) return;
+
+            try {
+                // Desativar todas as coleções
+                const batch = writeBatch(db);
+                colecoes.forEach(c => {
+                    const colecaoRef = doc(db, "colecoes", c.id);
+                    batch.update(colecaoRef, { ativa: false });
+                });
+
+                // Ativar a coleção selecionada
+                const colecaoRef = doc(db, "colecoes", collectionId);
+                batch.update(colecaoRef, { 
+                    ativa: true,
+                    updatedAt: new Date()
+                });
+
+                await batch.commit();
+                mostrarToast(`Coleção "${colecao.nome}" definida como ativa!`);
+
+            } catch (error) {
+                console.error("Erro ao ativar coleção:", error);
+                mostrarToast("Erro ao ativar coleção", "error");
+            }
+        }
+
+        async function excluirColecao(collectionId) {
+            const colecao = colecoes.find(c => c.id === collectionId);
+            if (!colecao) return;
+
+            // Verificar se há produtos nesta coleção
+            const produtosNaColecao = produtos.filter(prod => prod.colecaoId === collectionId);
+            
+            if (produtosNaColecao.length > 0) {
+                mostrarToast(`Não é possível excluir: ${produtosNaColecao.length} produtos estão nesta coleção.`, "error");
+                return;
+            }
+
+            if (!confirm(`Tem certeza que deseja excluir a coleção "${colecao.nome}"?`)) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, "colecoes", collectionId));
+                mostrarToast("Coleção excluída com sucesso!");
+                elementos.collectionModal.classList.remove('visivel');
+                
+            } catch (error) {
+                console.error("Erro ao excluir coleção:", error);
+                mostrarToast("Erro ao excluir coleção", "error");
+            }
+        }
+
+        // ===================================
+        // CONFIGURAÇÃO DE EVENT LISTENERS
+        // ===================================
+        function setupEventListeners() {
+            // Botões principais
+            elementos.addCollectionBtn.addEventListener('click', abrirModalCriacao);
+            elementos.emptyAddBtn.addEventListener('click', abrirModalCriacao);
+
+            // Ordenação
+            elementos.sortSelect.addEventListener('change', aplicarOrdenacao);
+
+            // Logout
+            elementos.logoutButton.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                } catch (error) {
+                    console.error("Erro ao fazer logout:", error);
+                    mostrarToast("Erro ao tentar sair", "error");
+                }
+            });
+
+            // Modal de coleção
+            document.getElementById('close-modal').addEventListener('click', () => {
+                elementos.collectionModal.classList.remove('visivel');
+            });
+
+            document.getElementById('cancel-modal').addEventListener('click', () => {
+                elementos.collectionModal.classList.remove('visivel');
+            });
+
+            document.getElementById('collection-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await salvarColecao();
+            });
+
+            // Auto-slug do nome
+            document.getElementById('collection-name').addEventListener('input', (e) => {
+                const slug = document.getElementById('collection-slug');
+                if (!slug.value || slug.value === slugify(document.getElementById('collection-slug').defaultValue)) {
+                    slug.value = slugify(e.target.value);
+                }
+            });
+
+            // Preview de imagem
+            document.getElementById('collection-image').addEventListener('input', (e) => {
+                const preview = document.getElementById('image-preview');
+                const img = document.getElementById('preview-image');
+                
+                if (e.target.value) {
+                    img.src = e.target.value;
+                    preview.classList.remove('hidden');
+                } else {
+                    preview.classList.add('hidden');
+                }
+            });
+
+            // Excluir coleção
+            document.getElementById('delete-collection-btn').addEventListener('click', () => {
+                if (currentCollectionId) {
+                    excluirColecao(currentCollectionId);
+                }
+            });
+
+            // Delegation para eventos dinâmicos
+            document.addEventListener('click', (e) => {
+                // Definir como ativa
+                if (e.target.classList.contains('set-active-btn') || e.target.closest('.set-active-btn')) {
+                    const collectionId = e.target.dataset.collectionId || e.target.closest('.set-active-btn').dataset.collectionId;
+                    definirComoAtiva(collectionId);
+                }
+
+                // Editar coleção
+                if (e.target.classList.contains('edit-collection') || e.target.closest('.edit-collection')) {
+                    const collectionId = e.target.dataset.collectionId || e.target.closest('.edit-collection').dataset.collectionId;
+                    abrirModalEdicao(collectionId);
+                }
+
+                // Excluir coleção
+                if (e.target.classList.contains('delete-collection') || e.target.closest('.delete-collection')) {
+                    const collectionId = e.target.dataset.collectionId || e.target.closest('.delete-collection').dataset.collectionId;
+                    excluirColecao(collectionId);
+                }
+            });
+        }
+
+        // Inicializar quando o DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

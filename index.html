@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laméd vs | Alfaiataria e Casa</title>
+    <meta name="description" content="Laméd vs | Criações em fibras naturais. Peças atemporais que unem elegância, bem-estar e propósito para você e seu lar.">
+
+    <!-- IMPORTAÇÕES DE BIBLIOTECAS EXTERNAS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@300;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Importação do Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">    
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
+
+    <!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BL1G961PGT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-BL1G961PGT');
+</script>
+    
+    <!-- ESTILOS CSS PERSONALIZADOS -->
+    <style>
+        :root {
+            --cor-fundo: #FFFFFF;
+            --cor-texto: #1F2937;
+            --cor-cta-escuro: #643f21;
+            --cor-ouro-acento: #A58A5C;
+            --cor-marrom-cta: #643f21;
+        }
+        
+        /* CORREÇÃO: Remove overflow horizontal */
+        html, body { 
+            overflow-x: hidden; 
+            max-width: 100%;
+            scroll-behavior: smooth; 
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--cor-fundo); 
+            color: var(--cor-texto); 
+            position: relative;
+        }
+        
+        .serif { font-family: 'Cormorant Garamond', serif; }
+        .allura { font-family: 'Allura', cursive; letter-spacing: 0.05em; }
+        
+        .main-button { 
+            background-color: var(--cor-cta-escuro); 
+            transition: all 0.3s ease; 
+        }
+        .main-button:hover { 
+            background-color: #7a5232; 
+            box-shadow: 0 4px 15px rgba(100, 63, 33, 0.5); 
+            transform: translateY(-2px); 
+        }
+        .gold-accent { color: var(--cor-ouro-acento); }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .scroll-animate.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #mobile-menu { 
+            transition: all 0.3s ease-in-out; 
+            transform: translateY(-10px); 
+            opacity: 0; 
+            pointer-events: none; 
+        }
+        #mobile-menu.active { 
+            transform: translateY(0); 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+        
+        .modal-overlay { 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 300ms ease-in-out; 
+        }
+        .modal-overlay.visivel { 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+        
+        #cart-drawer { 
+            transition: transform 0.3s ease-in-out; 
+            transform: translateX(100%); 
+        }
+        #cart-drawer.open { 
+            transform: translateX(0); 
+        }
+        
+        .floating-whatsapp {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            cursor: pointer;
+            animation: pulse-whatsapp 2s infinite;
+        }
+
+        @keyframes pulse-whatsapp {
+            0% { box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
+            50% { box-shadow: 0 6px 25px rgba(37, 211, 102, 0.7); }
+            100% { box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
+        }
+
+        .cart-item-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: linear-gradient(135deg, var(--cor-ouro-acento), #d4af37);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0);
+            transition: transform 0.3s ease;
+            border: 2px solid white;
+        }
+        .cart-item-count.visible { transform: scale(1); }
+
+        .accordion-content {
+            transition: max-height 0.4s ease, padding 0.4s ease, opacity 0.3s ease;
+            max-height: 500px;
+            opacity: 1;
+        }
+        .accordion-content.hidden {
+            max-height: 0 !important;
+            overflow: hidden;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            opacity: 0;
+        }
+        .accordion-button {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            color: var(--cor-texto);
+            border-top: 1px solid #e5e7eb;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        .accordion-button:hover { background-color: #f8fafc; }
+        .accordion-icon {
+            font-size: 1.25rem;
+            font-weight: 300;
+            color: var(--cor-texto);
+            transition: transform 0.4s ease;
+        }
+        .accordion-icon.rotate { transform: rotate(45deg); }
+
+        /* Estilos para produtos */
+        .product-image-container {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: 3/4;
+        }
+        
+        .product-image {
+            transition: opacity 0.5s ease-in-out;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-image.hover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+        }
+        
+        /* Efeito hover - sempre aplicado, mesmo com uma só imagem */
+        .product-image-container:hover .product-image.hover { opacity: 1; }
+        .product-image-container:hover .product-image.main { opacity: 0; }
+
+        /* Seletor de tamanhos */
+        .size-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .size-option {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .size-option:hover { border-color: var(--cor-ouro-acento); }
+        .size-option.selected {
+            background-color: var(--cor-ouro-acento);
+            color: white;
+            border-color: var(--cor-ouro-acento);
+        }
+        
+        .size-guide-note {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        /* Estilos para o Splide */
+        .splide__arrow {
+            background: rgba(255, 255, 255, 0.8);
+            opacity: 0.7;
+        }
+        
+        .splide__arrow:hover { opacity: 1; }
+        .splide__pagination__page.is-active { background: var(--cor-ouro-acento); }
+        
+        .splide__slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .thumbnail-slide {
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .thumbnail-slide.is-active { opacity: 1; }
+
+        /* Carrossel da home */
+        #home-splide .splide__track { overflow: visible; }
+        #home-splide .splide__list { display: flex; align-items: stretch; }
+        #home-splide .splide__slide { display: flex; height: auto; }
+        #home-splide .splide__slide > div { width: 100%; }
+
+        /* CARROSSEL PRINCIPAL - Adaptável à proporção da imagem */
+        #main-carousel .splide__slide {
+            height: auto;
+        }
+
+        #main-carousel .splide__slide img {
+            object-fit: contain;
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+        }
+
+        #main-carousel {
+            height: auto;
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        /* MOBILE - Carrossel ocupa largura total */
+        @media (max-width: 768px) {
+            #main-carousel {
+                max-width: 100%;
+                width: 100%;
+                margin-left: 0;
+                margin-right: 0;
+                padding: 0;
+            }
+            
+            #main-carousel .splide__slide {
+                width: 100% !important;
+            }
+            
+            #main-carousel .splide__slide img {
+                max-height: 70vh;
+                object-fit: contain;
+            }
+            
+            /* Ajuste do container principal para garantir alinhamento */
+            #product-detail-view .container {
+                padding-left: 0;
+                padding-right: 0;
+                max-width: 100%;
+            }
+            
+            #product-detail-view .flex.flex-col.md\:flex-row {
+                margin-left: 0;
+                margin-right: 0;
+            }
+            
+            /* Garantir que o conteúdo informativo também fique bem no mobile */
+            #product-detail-view > .flex > .md\:w-1\/2.lg\:w-2\/5 {
+                padding: 1rem;
+                width: 100%;
+            }
+            
+            /* Botão voltar com margem no mobile */
+            #back-to-gallery {
+                margin-left: 1rem;
+                margin-top: 1rem;
+            }
+            
+            /* Garantir que as setas de navegação fiquem dentro da imagem */
+            #main-carousel .splide__arrows {
+                padding: 0 10px;
+            }
+        }
+
+        /* CORREÇÃO: Container principal para evitar overflow */
+        .main-container {
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        /* CORREÇÃO: Seção hero com z-index corrigido */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+        }
+        
+        .hero-section img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+        
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 3;
+        }
+
+        /* Loading states */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            transform: translateX(-100%);
+            background-image: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0,
+                rgba(255, 255, 255, 0.2) 20%,
+                rgba(255, 255, 255, 0.5) 60%,
+                rgba(255, 255, 255, 0)
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .floating-whatsapp {
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .hero-section {
+                height: 70vh;
+            }
+        }
+
+        /* Estilos para o modal de checkout */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        /* Botão do carrinho */
+        .cart-btn {
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Estilos para cores */
+        .color-option {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .color-option:hover {
+            border-color: var(--cor-ouro-acento);
+        }
+
+        .color-option.selected {
+            border-color: var(--cor-ouro-acento);
+            background-color: #fefce8;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+    <!-- CABEÇALHO -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 grid grid-cols-3 items-center">
+            <div class="flex items-center gap-6">
+                <button id="menu-button" class="md:hidden text-2xl z-10 text-[--cor-texto]">☰</button>
+                <nav class="hidden md:flex gap-6 text-sm font-medium">
+                    <a href="#" data-page="page-collection" class="page-link hover:text-[--cor-ouro-acento]">COLEÇÃO</a>
+                </nav>
+            </div>
+
+            <a href="#" data-page="page-home" class="flex items-end page-link justify-center">
+                <h1 class="text-6xl text-[--cor-texto] leading-none allura">Laméd</h1>
+                <span class="text-xl gold-accent serif leading-none ml-1" style="transform: translateY(-0.5rem);">vs</span>
+            </a>
+
+            <div class="flex items-center justify-end">
+                <nav class="hidden md:flex gap-6 text-sm font-medium justify-end">
+                    <a href="#contato" class="hover:text-[--cor-ouro-acento]">CONTATO</a>
+                </nav>
+                <button id="cart-btn" class="cart-btn relative p-2 text-gray-700 hover:text-[--cor-marrom-cta] ml-4">
+                    <i class="fa-solid fa-shopping-bag text-xl"></i>
+                    <span id="cart-count" class="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+        
+        <nav id="mobile-menu" class="md:hidden bg-white shadow-lg border-t absolute w-full">
+            <a href="#" data-page="page-collection" class="page-link block px-4 py-3 hover:bg-gray-50">Coleção</a>
+            <a href="#contato" class="block px-4 py-3 hover:bg-gray-50">Contato</a>
+        </nav>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-container">
+        <!-- PÁGINA INICIAL -->
+        <div id="page-home" class="page active">
+            <!-- CORREÇÃO: Seção hero com z-index corrigido -->
+            <section class="hero-section flex items-center justify-center text-center p-4">
+                <img src="https://i.supaimg.com/843f581a-5106-4617-a59d-b6d2df49a5e1.webp" 
+                     alt="[Imagem de fundo da coleção Laméd]">
+                <div class="hero-overlay"></div>
+
+                <div class="hero-content bg-white/90 p-8 md:p-12 rounded-lg shadow-2xl max-w-lg">
+                    <h2 class="serif text-4xl md:text-6xl font-light mb-4 text-[--cor-texto]">Pré-Venda Exclusiva</h2>
+                    <p class="text-base md:text-xl mb-6 tracking-widest text-gray-700">Garanta suas peças antes do lançamento</p>
+                    <a href="#" data-page="page-collection" class="page-link main-button text-white font-semibold py-3 px-8 rounded-full uppercase text-sm tracking-wider">Encomende a Coleção</a>
+                    <div class="mt-4">
+                        <a href="#sobre" class="underline text-sm text-gray-600 hover:text-[--cor-ouro-acento]">Conheça Nossa História</a>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="home-collection-preview" class="py-16 px-4 scroll-animate">
+                <div class="container mx-auto max-w-7xl text-center">
+                    <h3 class="serif text-3xl md:text-4xl font-light mb-12">Lançamentos</h3>
+                    
+                    <div id="home-splide" class="splide mb-12">
+                        <div class="splide__track">
+                            <ul class="splide__list" id="home-splide-list">
+                                <div class="text-gray-600">Carregando peças...</div>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <a href="#" data-page="page-collection" class="page-link main-button text-white font-semibold py-3 px-8 rounded-full uppercase text-sm tracking-wider">Ver todas as peças</a>
+                </div>
+            </section>
+
+            <section id="sobre" class="py-16 px-4 bg-gray-50 scroll-animate">
+                 <div class="container mx-auto max-w-5xl text-center">
+                    <h3 class="serif text-3xl md:text-4xl font-light mb-6">Nossa Filosofia</h3>
+                    <p class="text-gray-700 text-lg leading-relaxed max-w-3xl mx-auto">A <strong class="allura text-[--cor-texto]">Laméd</strong><span class="text-sm gold-accent ml-1">VS</span> nasce da harmonia entre elegância, propósito e cuidado com você. Cada peça é confeccionada em fibras naturais, escolhidas por sua capacidade de transmitir bem-estar e elevar sua frequência. Mais que roupas, criamos experiências atemporais, conscientes e únicas — feitas para vestir seu corpo e inspirar sua mente.</p>
+                </div>
+            </section>
+            
+            <section id="mensagem" class="py-16 px-4 scroll-animate">
+                 <div class="container mx-auto max-w-5xl text-center">
+                    <h3 class="serif text-3xl md:text-4xl font-light mb-6">Uma Mensagem Para Você</h3>
+                    <div class="text-gray-700 text-lg leading-relaxed max-w-3xl mx-auto space-y-4">
+                        <p>Ao escolher uma de nossas criações, você se conecta com a sua essência. Nossos produtos são um convite ao bem-estar, desenvolvidos com o cuidado das fibras naturais e um design que honra quem você é.</p>
+                        <p>Os materiais que escolhemos dialogam com a energia do seu corpo e do seu ambiente, cultivando uma sensação de vitalidade e paz interior. Laméd vs fala de governo, é um lembrete do poder que reside em suas escolhas diárias, especialmente naquelas feitas com consciência e amor.</p>
+                        <p class="pt-4">Com carinho,<br><span class="allura text-4xl text-[--cor-texto]">Laméd</span><span class="text-xl gold-accent serif ml-1">vs</span></p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- PÁGINA DA COLEÇÃO -->
+        <div id="page-collection" class="page">
+            <section class="py-16 px-4 bg-white">
+                <div id="collection-gallery" class="container mx-auto max-w-7xl">
+                    <h3 class="serif text-3xl md:text-4xl font-light text-center mb-12 text-[--cor-texto]">Coleção Na Terra Como no Céu</h3>
+                    <div id="collection-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+                         <div class="col-span-full text-center">
+                            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status"></div>
+                            <p class="text-gray-600 mt-2">Carregando peças...</p>
+                         </div>
+                    </div>
+                </div>
+                
+                <div id="product-detail-view" class="hidden container mx-auto max-w-7xl">
+                    <button id="back-to-gallery" class="main-button text-white py-2 px-6 rounded text-sm mb-8">Voltar</button>
+                    <div class="flex flex-col md:flex-row gap-8 md:gap-12 md:items-start">
+                        <div class="md:w-1/2 lg:w-3/5">
+                            <div id="main-carousel" class="splide mb-4">
+                                <div class="splide__track">
+                                    <ul class="splide__list" id="main-carousel-list"></ul>
+                                </div>
+                            </div>
+                            
+                            <div id="thumbnail-carousel" class="splide">
+                                <div class="splide__track">
+                                    <ul class="splide__list" id="thumbnail-carousel-list"></ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="md:w-1/2 lg:w-2/5">
+                            <h2 id="detail-title" class="serif text-4xl font-light mb-4 text-[--cor-texto]"></h2>
+                            <div id="detail-price" class="text-2xl gold-accent mb-6 serif"></div>
+                            
+                            <div class="mb-6">
+                                <p class="text-sm font-medium text-gray-700 mb-2">Selecione o tamanho:</p>
+                                <div class="size-selector">
+                                    <div class="size-option" data-size="PP">PP</div>
+                                    <div class="size-option" data-size="P">P</div>
+                                    <div class="size-option" data-size="M">M</div>
+                                    <div class="size-option" data-size="G">G</div>
+                                    <div class="size-option" data-size="GG">GG</div>
+                                </div>
+                                <p class="size-guide-note">Consulte a tabela de medidas abaixo para escolher o tamanho correto</p>
+                                <p id="selected-size-display" class="text-green-700 font-semibold mt-3 hidden"></p>
+                            </div>
+
+                            <!-- Seletor de cores será inserido aqui dinamicamente -->
+
+                            <div class="space-y-3 mb-6">
+                               <button id="add-to-cart-button" class="w-full block text-center bg-[--cor-ouro-acento] text-white py-3 rounded-md text-sm font-semibold uppercase transition-opacity hover:opacity-90">Adicionar à Encomenda</button>
+                               <p id="add-to-cart-feedback" class="text-center text-sm text-gray-500 h-4"></p>
+                            </div>
+
+                            <div class="border-t border-gray-200">
+                                <div>
+                                    <button class="accordion-button accordion-toggle">
+                                        <span>Descrição</span>
+                                        <span class="accordion-icon">+</span>
+                                    </button>
+                                    <div class="accordion-content hidden mt-2 text-gray-600 text-sm leading-relaxed pb-4">
+                                        <p id="detail-description"></p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="accordion-button accordion-toggle">
+                                        <span>Guia de Medidas</span>
+                                        <span class="accordion-icon">+</span>
+                                    </button>
+                                    <div class="accordion-content hidden mt-2 text-gray-600 text-sm pb-4">
+                                        <table class="w-full text-left text-xs">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th class="p-2">Tamanho</th>
+                                                    <th class="p-2">Busto (cm)</th>
+                                                    <th class="p-2">Cintura (cm)</th>
+                                                    <th class="p-2">Quadril (cm)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="border-b"><td class="p-2 font-medium">PP (36)</td><td class="p-2">82-86</td><td class="p-2">62-66</td><td class="p-2">92-96</td></tr>
+                                                <tr class="border-b"><td class="p-2 font-medium">P (38)</td><td class="p-2">86-90</td><td class="p-2">66-70</td><td class="p-2">96-100</td></tr>
+                                                <tr class="border-b"><td class="p-2 font-medium">M (40)</td><td class="p-2">90-94</td><td class="p-2">70-74</td><td class="p-2">100-104</td></tr>
+                                                <tr class="border-b"><td class="p-2 font-medium">G (42)</td><td class="p-2">94-98</td><td class="p-2">74-78</td><td class="p-2">104-108</td></tr>
+                                                <tr><td class="p-2 font-medium">GG (44)</td><td class="p-2">98-102</td><td class="p-2">78-82</td><td class="p-2">108-112</td></tr>
+                                            </tbody>
+                                        </table>
+                                        <p class="text-xs text-center mt-2 text-gray-500">Valores em centímetros (cm)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- CARRINHO -->
+    <div id="cart-overlay" class="modal-overlay fixed inset-0 bg-black/50 z-[70]"></div>
+    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-[80] flex flex-col">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h2 class="text-xl font-semibold serif">Minha Encomenda</h2>
+            <button id="close-cart-btn" class="text-2xl text-gray-500 hover:text-gray-800">&times;</button>
+        </div>
+        
+        <div id="cart-items-container" class="flex-grow p-4 overflow-y-auto">
+            <p id="cart-empty-msg" class="text-gray-500 text-center mt-8">Sua sacola de encomendas está vazia.</p>
+        </div>
+        
+        <div class="p-4 border-t space-y-4">
+            <div class="flex justify-between font-semibold text-lg">
+                <span>Subtotal:</span>
+                <span id="cart-subtotal">R$ 0,00</span>
+            </div>
+            <button id="finalizar-pedido-btn" class="w-full bg-[--cor-marrom-cta] text-white py-3 rounded-lg font-semibold text-lg hover:bg-[#5a3d2b] transition-colors">
+                Finalizar Pedido
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Finalização de Pedido -->
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold">Finalizar Pedido</h2>
+                <button class="close-modal text-2xl">&times;</button>
+            </div>
+
+            <form id="checkout-form" class="space-y-4">
+                <!-- Informações do Cliente (Opcionais) -->
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-blue-800 mb-3">Informações de Contato (Opcional)</h3>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Nome</label>
+                            <input type="text" name="nome" class="w-full border border-gray-300 rounded px-3 py-2" 
+                                   placeholder="Seu nome completo">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Telefone</label>
+                            <input type="tel" name="telefone" class="w-full border border-gray-300 rounded px-3 py-2" 
+                                   placeholder="(11) 99999-9999">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">E-mail</label>
+                            <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2" 
+                                   placeholder="seu@email.com">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endereço (Opcional) -->
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-green-800 mb-3">Endereço de Entrega (Opcional)</h3>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Rua</label>
+                            <input type="text" name="rua" class="w-full border border-gray-300 rounded px-3 py-2" 
+                                   placeholder="Nome da rua">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Número</label>
+                                <input type="text" name="numero" class="w-full border border-gray-300 rounded px-3 py-2" 
+                                       placeholder="123">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">CEP</label>
+                                <input type="text" name="cep" class="w-full border border-gray-300 rounded px-3 py-2" 
+                                       placeholder="01234-567">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Cidade</label>
+                            <input type="text" name="cidade" class="w-full border border-gray-300 rounded px-3 py-2" 
+                                   placeholder="Sua cidade">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumo do Pedido -->
+                <div class="border-t pt-4">
+                    <h3 class="font-semibold mb-3">Resumo do Pedido</h3>
+                    <div id="checkout-summary">
+                        <!-- Itens serão inseridos aqui -->
+                    </div>
+                    <div class="flex justify-between items-center mt-3 pt-3 border-t">
+                        <span class="font-semibold">Total:</span>
+                        <span id="checkout-total" class="text-xl font-bold text-[--cor-marrom-cta]">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="flex gap-3 pt-4">
+                    <button type="button" class="close-modal flex-1 bg-gray-300 text-gray-700 py-2 rounded">
+                        Voltar
+                    </button>
+                    <button type="submit" class="flex-1 bg-[--cor-marrom-cta] text-white py-2 rounded font-semibold">
+                        Finalizar Pedido
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- RODAPÉ -->
+    <footer id="contato" class="bg-gray-100 text-gray-700 py-12 px-4">
+        <div class="container mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <h4 class="flex items-end space-x-0 mb-4"><span class="allura text-5xl text-[--cor-texto]">Laméd</span><span class="text-lg gold-accent ml-1">vs</span></h4>
+                <p class="text-sm">Lamed vs é Atemporal.</p>
+                <p class="text-sm">Lamed vs é Profético.</p>
+                <p class="text-sm">Lamed vs é Alta frequência.</p>
+            </div>
+            <div>
+                <h4 class="font-semibold text-lg text-[--cor-texto] mb-4">Contato</h4>
+                <div class="text-sm leading-relaxed">
+                    <p><a href="https://www.google.com/maps/place/Ver%C3%B4nica+Soares+Ateli%C3%AA/@-20.3105031,-40.2987008,17z/data=!3m1!4b1!4m6!3m5!1s0xb817ca1a8204bf:0x4bee6de6cd9fdfe2!8m2!3d-20.3105031!4d-40.2987008!16s%2Fg%2F11q1db66vh" target="_blank" rel="noopener noreferrer" class="hover:text-[--cor-ouro-acento] underline">Servidão Otávio Pagoto, 1335 - Santa Lucia, Vitória - ES, 29056-015</a></p>
+                    <p>E-mail: <a href="mailto:veronicaateliercursos@gmail.com" class="hover:text-[--cor-ouro-acento] underline">veronicaateliercursos@gmail.com</a></p>
+                    <p>WhatsApp: <a href="https://wa.me/5527999287657" target="_blank" class="hover:text-[--cor-ouro-acento] underline">(27) 99928-7657</a></p>
+                </div>
+                <div class="flex space-x-4 mt-4 text-2xl">
+                    <a href="https://www.instagram.com/veronicasoaresatelier?igsh=MTZiODhnZWlnY3l6dQ==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="hover:text-[--cor-ouro-acento]">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://www.facebook.com/Veronicaaguiar237/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="hover:text-[--cor-ouro-acento]">
+                        <i class="fa-brands fa-square-facebook"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-300 mt-8 pt-4">
+            <div class="text-center text-xs text-gray-500">&copy; 2025 Laméd vs. Todos os direitos reservados.</div>
+            <div class="text-center text-xs mt-2">
+                <a href="login-admin.html" class="text-gray-400 hover:text-gray-600">Acesso Restrito</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- BOTÃO WHATSAPP -->
+    <a id="floating-wpp-btn" href="https://wa.me/5527999287657" target="_blank" rel="noopener noreferrer" class="floating-whatsapp" aria-label="Fale conosco no WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    
+    <script>
+        // Configuração do Firebase - SUAS CREDENCIAIS
+        const firebaseConfig = {
+            apiKey: "AIzaSyCzB4_YotWCPVh1yaqWkhbB4LypPQYvV4U",
+            authDomain: "site-lamed.firebaseapp.com",
+            databaseURL: "https://site-lamed-default-rtdb.firebaseio.com",
+            projectId: "site-lamed",
+            storageBucket: "site-lamed.firebasestorage.app",
+            messagingSenderId: "862756160215",
+            appId: "1:862756160215:web:d0fded233682bf93eaa692",
+            measurementId: "G-BL1G961PGT"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // VARIÁVEIS GLOBAIS
+        let products = [];
+        let cart = [];
+        let currentProduct = null;
+        let selectedSize = null;
+        let selectedColor = null;
+        let isTransitioning = false;
+        let productDetailOrigin = 'page-collection';
+        let splideMain = null;
+        let splideThumbnails = null;
+        let homeSplide = null;
+
+        // ELEMENTOS DO DOM
+        const elements = {
+            cartOverlay: document.getElementById('cart-overlay'),
+            cartDrawer: document.getElementById('cart-drawer'),
+            cartButton: document.getElementById('cart-btn'),
+            closeCartButton: document.getElementById('close-cart-btn'),
+            cartItemsContainer: document.getElementById('cart-items-container'),
+            cartEmptyMsg: document.getElementById('cart-empty-msg'),
+            cartSubtotalEl: document.getElementById('cart-subtotal'),
+            cartCountBadge: document.getElementById('cart-count'),
+            floatingWppBtn: document.getElementById('floating-wpp-btn'),
+            addToCartBtn: document.getElementById('add-to-cart-button'),
+            addToCartFeedbackEl: document.getElementById('add-to-cart-feedback'),
+            selectedSizeDisplay: document.getElementById('selected-size-display'),
+            menuButton: document.getElementById('menu-button'),
+            mobileMenu: document.getElementById('mobile-menu'),
+            finalizarPedidoBtn: document.getElementById('finalizar-pedido-btn'),
+            checkoutModal: document.getElementById('checkout-modal'),
+            checkoutForm: document.getElementById('checkout-form'),
+            checkoutSummary: document.getElementById('checkout-summary'),
+            checkoutTotal: document.getElementById('checkout-total')
+        };
+
+        // ===================================
+        // FUNÇÕES PRINCIPAIS
+        // ===================================
+
+        function showPage(pageId, showDetails = false, productId = null) {
+            if (isTransitioning) return;
+            
+            const currentPage = document.querySelector('.page.active');
+            const nextPage = document.getElementById(pageId);
+            
+            if (!nextPage || (currentPage && currentPage.id === pageId && !showDetails)) return;
+            
+            isTransitioning = true;
+            
+            if (currentPage) {
+                currentPage.classList.remove('active');
+            }
+            
+            nextPage.classList.add('active');
+            window.scrollTo(0, 0);
+
+            if (pageId === 'page-collection') {
+                if (showDetails && productId) {
+                    showProductDetail(productId);
+                } else {
+                    showCollectionView();
+                }
+            }
+            
+            isTransitioning = false;
+        }
+
+        function createProductCard(peca, isPreview = false) {
+            const card = document.createElement('div');
+            card.className = isPreview ? "h-full" : "bg-white overflow-hidden transform hover:scale-105 transition-transform duration-300 cursor-pointer";
+
+            const precoOriginal = parseFloat(peca.preco || 0);
+            const desconto = peca.desconto || 0;
+            const precoComDesconto = precoOriginal * (1 - desconto / 100);
+            
+            const descricaoCurta = peca.descricao && peca.descricao.length > 50 ? 
+                peca.descricao.substring(0, 50) + '...' : 
+                (peca.descricao || 'Peça exclusiva Laméd');
+            
+            // Usar múltiplas imagens
+            const hasMultipleImages = peca.imagens && Array.isArray(peca.imagens) && peca.imagens.length > 1;
+            const mainImage = (peca.imagens && peca.imagens[0]) || peca.imagem || 'https://placehold.co/400x600/f1f1f1/ccc?text=Laméd+vs';
+            const hoverImage = hasMultipleImages ? peca.imagens[1] : mainImage;
+
+            // Calcular total em estoque
+            const totalEstoque = peca.cores ? peca.cores.reduce((total, cor) => total + (cor.quantidade || 0), 0) : 0;
+
+            card.innerHTML = `
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col text-left border border-gray-100">
+                    <div class="product-image-container relative">
+                        <img src="${mainImage}" class="product-image main w-full h-full object-cover" alt="Foto da peça ${peca.nome}" loading="lazy">
+                        <img src="${hoverImage}" class="product-image hover w-full h-full object-cover" alt="Foto alternativa da peça ${peca.nome}" loading="lazy">
+                        
+                        ${desconto > 0 ? `
+                            <div class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded font-bold">
+                                -${desconto}%
+                            </div>
+                        ` : ''}
+                        
+                        ${hasMultipleImages ? `
+                            <div class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                                +${peca.imagens.length - 1}
+                            </div>
+                        ` : ''}
+                        
+                        ${totalEstoque <= 0 ? `
+                            <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <span class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-semibold">
+                                    ESGOTADO
+                                </span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="p-4 mt-auto">
+                        <h4 class="font-medium text-lg truncate" title="${peca.nome}">${peca.nome}</h4>
+                        <p class="text-sm text-gray-500 mt-1 h-5 overflow-hidden" title="${peca.descricao}">${descricaoCurta}</p>
+                        
+                        <div class="flex items-center gap-2 mt-2">
+                            ${desconto > 0 ? `
+                                <span class="text-lg font-bold text-[--cor-marrom-cta]">R$ ${precoComDesconto.toFixed(2).replace('.',',')}</span>
+                                <span class="text-sm text-gray-500 line-through">R$ ${precoOriginal.toFixed(2).replace('.',',')}</span>
+                            ` : `
+                                <span class="text-lg font-bold text-[--cor-marrom-cta]">R$ ${precoOriginal.toFixed(2).replace('.',',')}</span>
+                            `}
+                        </div>
+
+                        <!-- Mostrar cores disponíveis (APENAS AS DISPONÍVEIS) -->
+                        ${peca.cores && peca.cores.filter(cor => cor.quantidade > 0).length > 0 ? `
+                            <div class="flex items-center gap-2 mt-2">
+                                <div class="flex gap-1">
+                                    ${peca.cores.filter(cor => cor.quantidade > 0).slice(0, 4).map(cor => `
+                                        <div class="w-4 h-4 rounded-full border border-gray-300" 
+                                             style="background-color: ${cor.hex}" 
+                                             title="${cor.nome}">
+                                        </div>
+                                    `).join('')}
+                                    ${peca.cores.filter(cor => cor.quantidade > 0).length > 4 ? `
+                                        <div class="text-xs text-gray-500 flex items-center">
+                                            +${peca.cores.filter(cor => cor.quantidade > 0).length - 4}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            card.addEventListener('click', () => {
+                if (totalEstoque <= 0) return; // Não permite clicar se estiver esgotado
+                
+                productDetailOrigin = isPreview ? 'page-home' : 'page-collection';
+                if (isPreview) {
+                    showPageAndProduct('page-collection', peca.id);
+                } else {
+                    showProductDetail(peca.id);
+                }
+            });
+            
+            return card;
+        }
+
+        function showPageAndProduct(pageId, productId) {
+            showPage(pageId, true, productId);
+        }
+
+        function atualizarGridProdutos() {
+            const collectionGrid = document.getElementById('collection-grid');
+            collectionGrid.innerHTML = '';
+
+            if (products.length === 0) {
+                collectionGrid.innerHTML = '<p class="text-gray-600 col-span-full text-center">Nenhuma peça encontrada na coleção.</p>';
+                return;
+            }
+
+            products.forEach(peca => {
+                const card = createProductCard(peca, false);
+                collectionGrid.appendChild(card);
+            });
+        }
+
+        function popularPreviewColecao() {
+            const splideList = document.getElementById('home-splide-list');
+            if (!splideList) return;
+
+            const shuffledProducts = [...products].sort(() => 0.5 - Math.random());
+            const randomProducts = shuffledProducts.slice(0, 8); 
+
+            splideList.innerHTML = '';
+
+            if (randomProducts.length === 0) {
+                splideList.innerHTML = '<li class="splide__slide"><p class="text-center text-gray-700">Nenhuma peça na coleção no momento.</p></li>';
+                return;
+            }
+
+            randomProducts.forEach(peca => {
+                const slide = document.createElement('li');
+                slide.className = 'splide__slide';
+                const card = createProductCard(peca, true);
+                slide.appendChild(card);
+                splideList.appendChild(slide);
+            });
+
+            // Inicializar Splide para a home - AGUARDAR AS IMAGENS CARREGAREM
+            setTimeout(() => {
+                if (homeSplide) {
+                    homeSplide.destroy();
+                }
+                
+                homeSplide = new Splide('#home-splide', {
+                    type: 'slide',
+                    perPage: 4,
+                    perMove: 1,
+                    gap: '20px',
+                    pagination: false,
+                    breakpoints: {
+                        640: { perPage: 2 },
+                        1024: { perPage: 3 },
+                    },
+                }).mount();
+            }, 100);
+        }
+
+        // CORREÇÃO: Função carregarPecas corrigida
+        function carregarPecas() {
+            const collectionGrid = document.getElementById('collection-grid');
+            collectionGrid.innerHTML = `
+                <div class="col-span-full text-center">
+                    <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status"></div>
+                    <p class="text-gray-600 mt-2">Carregando peças...</p>
+                </div>
+            `;
+
+            // Primeiro carrega a coleção ativa
+            db.collection("colecoes").where("ativa", "==", true).get()
+                .then((colecoesSnapshot) => {
+                    let colecaoAtiva = null;
+                    
+                    if (!colecoesSnapshot.empty) {
+                        const doc = colecoesSnapshot.docs[0];
+                        colecaoAtiva = {
+                            id: doc.id,
+                            ...doc.data()
+                        };
+                        
+                        // Atualizar título da página
+                        const tituloColecao = document.querySelector('#page-collection h3');
+                        if (tituloColecao && colecaoAtiva.nome) {
+                            tituloColecao.textContent = colecaoAtiva.nome;
+                        }
+                    }
+
+                    // Agora carrega produtos ativos
+                    let produtosQuery = db.collection("pecas").where("status", "==", "active");
+                    
+                    // Se existe uma coleção ativa, filtra por ela
+                    if (colecaoAtiva) {
+                        produtosQuery = produtosQuery.where("colecaoId", "==", colecaoAtiva.id);
+                    }
+
+                    return produtosQuery.get();
+                })
+                .then((produtosSnapshot) => {
+                    products = [];
+                    produtosSnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        
+                        let imagensArray = [];
+                        
+                        if (data.imagens && Array.isArray(data.imagens) && data.imagens.length > 0) {
+                            imagensArray = data.imagens;
+                        } else if (data.imagem && typeof data.imagem === 'string') {
+                            imagensArray = [data.imagem];
+                        } else {
+                            imagensArray = ['https://placehold.co/400x600/f1f1f1/ccc?text=Laméd+vs'];
+                        }
+                        
+                        products.push({
+                            id: doc.id,
+                            nome: data.nome,
+                            descricao: data.descricao,
+                            preco: data.preco,
+                            desconto: data.desconto || 0,
+                            imagens: imagensArray,
+                            categoria: data.categoria,
+                            colecaoId: data.colecaoId,
+                            ordem: data.ordem || 0,
+                            status: data.status || 'active',
+                            cores: data.cores || [],
+                            tags: data.tags || ''
+                        });
+                    });
+
+                    // Ordena pela ordem definida no admin
+                    products.sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+
+                    atualizarGridProdutos();
+                    popularPreviewColecao();
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar peças: ", error);
+                    collectionGrid.innerHTML = '<p class="text-gray-600 col-span-full text-center">Erro ao carregar produtos. Tente novamente mais tarde.</p>';
+                });
+        }
+
+        function showCollectionView() {
+            document.getElementById('product-detail-view').classList.add('hidden');
+            document.getElementById('collection-gallery').classList.remove('hidden');
+        }
+
+        function showProductDetail(productId) {
+            currentProduct = products.find(p => p.id === productId);
+            if (!currentProduct) return;
+            
+            // Resetar seleções
+            selectedSize = null;
+            selectedColor = null;
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            elements.selectedSizeDisplay.classList.add('hidden');
+            elements.selectedSizeDisplay.textContent = '';
+            elements.addToCartFeedbackEl.textContent = '';
+
+            const productDetailView = document.getElementById('product-detail-view');
+            document.getElementById('collection-gallery').classList.add('hidden');
+            productDetailView.classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            document.getElementById('detail-title').textContent = currentProduct.nome;
+            document.getElementById('detail-description').textContent = currentProduct.descricao || 'Descrição não disponível.';
+            
+            // Atualizar preço com desconto
+            const precoOriginal = parseFloat(currentProduct.preco);
+            const desconto = currentProduct.desconto || 0;
+            const precoComDesconto = precoOriginal * (1 - desconto / 100);
+            
+            if (desconto > 0) {
+                document.getElementById('detail-price').innerHTML = `
+                    <span class="text-2xl font-bold text-[--cor-marrom-cta]">R$ ${precoComDesconto.toFixed(2).replace('.',',')}</span>
+                    <span class="text-lg text-gray-500 line-through ml-2">R$ ${precoOriginal.toFixed(2).replace('.',',')}</span>
+                    <span class="bg-red-500 text-white text-sm px-2 py-1 rounded ml-2">-${desconto}%</span>
+                `;
+            } else {
+                document.getElementById('detail-price').textContent = `R$ ${precoOriginal.toFixed(2).replace('.',',')}`;
+            }
+
+            setupSplideCarousel();
+            
+            // Adicionar seletor de cores se houver
+            adicionarSeletorDeCores();
+
+            // Resetar acordeões
+            document.querySelectorAll('.accordion-content').forEach(content => content.classList.add('hidden'));
+            document.querySelectorAll('.accordion-icon').forEach(icon => {
+                icon.textContent = '+';
+                icon.classList.remove('rotate');
+            });
+        }
+
+        // Nova função para adicionar seletor de cores
+        function adicionarSeletorDeCores() {
+            // Remove seletor anterior se existir
+            const existingColorSelector = document.querySelector('.color-selector-container');
+            if (existingColorSelector) {
+                existingColorSelector.remove();
+            }
+
+            // FILTRAR: Mostrar apenas cores com estoque > 0
+            const coresDisponiveis = currentProduct.cores.filter(cor => cor.quantidade > 0);
+
+            if (coresDisponiveis && coresDisponiveis.length > 0) {
+                const colorSelector = document.createElement('div');
+                colorSelector.className = 'color-selector-container mb-6';
+                colorSelector.innerHTML = `
+                    <p class="text-sm font-medium text-gray-700 mb-2">Selecione a cor:</p>
+                    <div class="color-selector grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
+                        ${coresDisponiveis.map((cor, index) => `
+                            <div class="color-option border-2 border-gray-200 rounded-lg p-3 cursor-pointer transition-all hover:border-[--cor-ouro-acento] ${
+                                index === 0 ? 'border-[--cor-ouro-acento] bg-amber-50' : ''
+                            }" data-color-index="${currentProduct.cores.indexOf(cor)}">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-6 h-6 rounded-full border border-gray-300" style="background-color: ${cor.hex}"></div>
+                                    <div class="flex-1">
+                                        <div class="font-medium text-sm">${cor.nome}</div>
+                                        <!-- REMOVIDO: Exibição da quantidade disponível -->
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p id="selected-color-display" class="text-green-700 font-semibold mt-3 hidden"></p>
+                `;
+                
+                // Inserir após o seletor de tamanhos
+                const sizeSection = document.querySelector('.size-selector').parentElement;
+                sizeSection.parentNode.insertBefore(colorSelector, sizeSection.nextSibling);
+                
+                // Adicionar eventos para seleção de cores
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        const colorIndex = parseInt(this.dataset.colorIndex);
+                        const cor = currentProduct.cores[colorIndex];
+                        
+                        // Atualizar seleção visual
+                        document.querySelectorAll('.color-option').forEach(opt => {
+                            opt.classList.remove('border-[--cor-ouro-acento]', 'bg-amber-50');
+                            opt.classList.add('border-gray-200');
+                        });
+                        
+                        this.classList.add('border-[--cor-ouro-acento]', 'bg-amber-50');
+                        this.classList.remove('border-gray-200');
+                        
+                        selectedColor = colorIndex;
+                        
+                        // Atualizar display
+                        elements.selectedColorDisplay = document.getElementById('selected-color-display');
+                        elements.selectedColorDisplay.textContent = `Cor selecionada: ${cor.nome}`;
+                        elements.selectedColorDisplay.classList.remove('hidden');
+                        
+                        // Habilitar/desabilitar botão baseado no estoque
+                        updateAddToCartButton();
+                    });
+                });
+                
+                // Selecionar primeira cor disponível por padrão
+                document.querySelector('.color-option').click();
+            } else if (currentProduct.cores && currentProduct.cores.length > 0) {
+                // Se há cores mas nenhuma disponível, desabilita o botão
+                elements.addToCartBtn.disabled = true;
+                elements.addToCartBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                elements.addToCartBtn.textContent = 'PRODUTO ESGOTADO';
+            }
+        }
+
+        function updateAddToCartButton() {
+            const corSelecionada = selectedColor !== null ? currentProduct.cores[selectedColor] : null;
+            
+            // MODIFICADO: Agora sempre tem estoque pois mostramos apenas cores disponíveis
+            const temEstoque = corSelecionada ? true : (currentProduct.cores ? false : true);
+            
+            if (temEstoque && selectedSize) {
+                elements.addToCartBtn.disabled = false;
+                elements.addToCartBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                elements.addToCartBtn.textContent = 'ADICIONAR À ENCOMENDA';
+            } else {
+                elements.addToCartBtn.disabled = true;
+                elements.addToCartBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                elements.addToCartBtn.textContent = 'SELECIONE TAMANHO' + (currentProduct.cores ? ' E COR' : '');
+            }
+        }
+
+        function setupSplideCarousel() {
+            if (splideMain) splideMain.destroy();
+            if (splideThumbnails) splideThumbnails.destroy();
+
+            const mainCarouselList = document.getElementById('main-carousel-list');
+            const thumbnailCarouselList = document.getElementById('thumbnail-carousel-list');
+            
+            mainCarouselList.innerHTML = '';
+            thumbnailCarouselList.innerHTML = '';
+
+            // Usa o array de imagens do produto
+            const images = currentProduct.imagens && currentProduct.imagens.length > 0 
+                ? currentProduct.imagens 
+                : ['https://placehold.co/600x800/f1f1f1/ccc?text=Sem+imagem'];
+
+            images.forEach((img, index) => {
+                const mainSlide = document.createElement('li');
+                mainSlide.className = 'splide__slide';
+                mainSlide.innerHTML = `<img src="${img}" alt="${currentProduct.nome} - Imagem ${index + 1}" loading="lazy">`;
+                mainCarouselList.appendChild(mainSlide);
+
+                const thumbSlide = document.createElement('li');
+                thumbSlide.className = 'splide__slide thumbnail-slide';
+                thumbSlide.innerHTML = `<img src="${img}" alt="${currentProduct.nome} - Miniatura ${index + 1}" loading="lazy">`;
+                thumbnailCarouselList.appendChild(thumbSlide);
+            });
+
+            // Configuração do carrossel principal - adaptável
+            splideMain = new Splide('#main-carousel', {
+                type: 'fade',
+                rewind: true,
+                pagination: false,
+                arrows: true,
+                width: '100%',
+                height: 'auto', // Altura automática baseada na imagem
+            });
+
+            // Configuração do carrossel de miniaturas
+            splideThumbnails = new Splide('#thumbnail-carousel', {
+                fixedWidth: 100,
+                fixedHeight: 75,
+                gap: 10,
+                rewind: true,
+                pagination: false,
+                isNavigation: true,
+                arrows: false,
+                breakpoints: {
+                    600: {
+                        fixedWidth: 60,
+                        fixedHeight: 45,
+                    },
+                },
+            });
+
+            splideMain.sync(splideThumbnails);
+            splideMain.mount();
+            splideThumbnails.mount();
+            
+            // Força o redimensionamento após o carregamento das imagens
+            setTimeout(() => {
+                if (splideMain) {
+                    splideMain.refresh();
+                }
+            }, 100);
+        }
+
+        // ===================================
+        // CARRINHO DE COMPRAS
+        // ===================================
+
+        function loadCart() {
+            cart = JSON.parse(localStorage.getItem('lamedCart')) || [];
+            updateCart();
+        }
+
+        function saveCart() {
+            localStorage.setItem('lamedCart', JSON.stringify(cart));
+            updateCart();
+        }
+
+        function updateCart() {
+            if (cart.length === 0) {
+                elements.cartEmptyMsg.classList.remove('hidden');
+                elements.cartItemsContainer.innerHTML = '';
+                elements.cartItemsContainer.appendChild(elements.cartEmptyMsg);
+            } else {
+                elements.cartEmptyMsg.classList.add('hidden');
+                elements.cartItemsContainer.innerHTML = '';
+                
+                cart.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'flex gap-4 mb-4 border-b pb-4';
+                    itemEl.innerHTML = `
+                        <img src="${item.image}" alt="${item.nome}" class="w-20 h-24 object-cover rounded-md">
+                        <div class="flex-grow">
+                            <h4 class="font-semibold">${item.nome}</h4>
+                            <p class="text-sm text-gray-500">Tamanho: ${item.tamanho}</p>
+                            ${item.cor ? `<p class="text-sm text-gray-500">Cor: ${item.cor.nome}</p>` : ''}
+                            <p class="text-sm gold-accent serif">R$ ${parseFloat(item.preco).toFixed(2).replace('.',',')}</p>
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="flex items-center border rounded">
+                                    <button data-id="${item.cartItemId}" class="cart-qty-change px-2 py-1" data-change="-1">−</button>
+                                    <span class="px-3 text-sm">${item.quantity}</span>
+                                    <button data-id="${item.cartItemId}" class="cart-qty-change px-2 py-1" data-change="1">+</button>
+                                </div>
+                                <button data-id="${item.cartItemId}" class="cart-remove text-xs text-red-500 hover:underline">Remover</button>
+                            </div>
+                        </div>
+                    `;
+                    elements.cartItemsContainer.appendChild(itemEl);
+                });
+            }
+
+            const subtotal = cart.reduce((total, item) => total + (item.preco * item.quantity), 0);
+            elements.cartSubtotalEl.textContent = `R$ ${subtotal.toFixed(2).replace('.',',')}`;
+
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            elements.cartCountBadge.textContent = totalItems;
+            if (totalItems > 0) {
+                elements.cartCountBadge.style.display = 'flex';
+            } else {
+                elements.cartCountBadge.style.display = 'none';
+            }
+        }
+
+        function openCart() {
+            elements.cartOverlay.classList.add('visivel');
+            elements.cartDrawer.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            elements.floatingWppBtn.classList.add('hidden');
+        }
+
+        function closeCart() {
+            elements.cartDrawer.classList.remove('open');
+            elements.cartOverlay.classList.remove('visivel');
+            document.body.style.overflow = '';
+            elements.floatingWppBtn.classList.remove('hidden');
+        }
+
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                alert('Seu carrinho está vazio!');
+                return;
+            }
+
+            updateCheckoutSummary();
+            elements.checkoutModal.classList.add('active');
+            closeCart();
+        }
+
+        function closeCheckoutModal() {
+            elements.checkoutModal.classList.remove('active');
+        }
+
+        function updateCheckoutSummary() {
+            let total = 0;
+            let html = '';
+
+            cart.forEach(item => {
+                const subtotal = item.preco * item.quantity;
+                total += subtotal;
+
+                html += `
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <div class="flex-1">
+                            <p class="font-medium">${item.nome}</p>
+                            <p class="text-sm text-gray-600">
+                                ${item.tamanho ? `Tamanho: ${item.tamanho} • ` : ''}
+                                ${item.cor ? `Cor: ${item.cor.nome} • ` : ''}
+                                Qtd: ${item.quantity}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold">R$ ${subtotal.toFixed(2).replace('.',',')}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            elements.checkoutSummary.innerHTML = html;
+            elements.checkoutTotal.textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
+        }
+
+        // Função para gerar mensagem do WhatsApp
+        function gerarMensagemWhatsApp(pedidoId, itens, total, cliente) {
+            let mensagem = `🛍️ *NOVO PEDIDO - Laméd vs* 🛍️\n\n`;
+            mensagem += `*Pedido:* #${pedidoId.substring(0, 8).toUpperCase()}\n\n`;
+            
+            // Informações do cliente (se fornecidas)
+            if (cliente.nome || cliente.telefone || cliente.email) {
+                mensagem += `*Dados do Cliente:*\n`;
+                if (cliente.nome) mensagem += `• Nome: ${cliente.nome}\n`;
+                if (cliente.telefone) mensagem += `• Telefone: ${cliente.telefone}\n`;
+                if (cliente.email) mensagem += `• E-mail: ${cliente.email}\n`;
+                mensagem += `\n`;
+            }
+            
+            // Endereço (se fornecido)
+            if (cliente.endereco.rua || cliente.endereco.cidade) {
+                mensagem += `*Endereço de Entrega:*\n`;
+                if (cliente.endereco.rua) mensagem += `• Rua: ${cliente.endereco.rua}`;
+                if (cliente.endereco.numero) mensagem += `, ${cliente.endereco.numero}`;
+                if (cliente.endereco.rua || cliente.endereco.numero) mensagem += `\n`;
+                if (cliente.endereco.cidade) mensagem += `• Cidade: ${cliente.endereco.cidade}\n`;
+                if (cliente.endereco.cep) mensagem += `• CEP: ${cliente.endereco.cep}\n`;
+                mensagem += `\n`;
+            }
+            
+            // Itens do pedido
+            mensagem += `*Itens do Pedido:*\n`;
+            itens.forEach((item, index) => {
+                mensagem += `${index + 1}. ${item.nome}\n`;
+                mensagem += `   • Tamanho: ${item.tamanho}\n`;
+                if (item.cor) mensagem += `   • Cor: ${item.cor.nome}\n`;
+                mensagem += `   • Quantidade: ${item.quantity}\n`;
+                mensagem += `   • Preço: R$ ${(item.preco * item.quantity).toFixed(2).replace('.', ',')}\n\n`;
+            });
+            
+            // Total
+            mensagem += `*VALOR TOTAL: R$ ${total.toFixed(2).replace('.', ',')}*\n\n`;
+            
+            mensagem += `_Este pedido foi gerado automaticamente através do site._`;
+            
+            return mensagem;
+        }
+
+        async function finalizarPedido(formData) {
+            // Coletar dados do cliente (todos opcionais)
+            const cliente = {
+                nome: formData.get('nome') || '',
+                telefone: formData.get('telefone') || '',
+                email: formData.get('email') || '',
+                endereco: {
+                    rua: formData.get('rua') || '',
+                    numero: formData.get('numero') || '',
+                    cidade: formData.get('cidade') || '',
+                    cep: formData.get('cep') || ''
+                }
+            };
+
+            // Calcular total
+            const total = cart.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
+
+            try {
+                // Criar pedido no Firebase
+                const pedidoRef = await db.collection("pedidos").add({
+                    status: "pendente",
+                    produtos: cart,
+                    cliente: cliente,
+                    total: total,
+                    data: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Gerar mensagem para WhatsApp
+                const mensagemWhatsApp = gerarMensagemWhatsApp(pedidoRef.id, cart, total, cliente);
+                const urlWhatsApp = `https://wa.me/5527999287657?text=${encodeURIComponent(mensagemWhatsApp)}`;
+                
+                // Limpar carrinho
+                cart = [];
+                saveCart();
+                
+                // Fechar modal
+                closeCheckoutModal();
+                
+                // Abrir WhatsApp com a mensagem
+                window.open(urlWhatsApp, '_blank');
+                
+                // Mostrar confirmação
+                mostrarConfirmacao(pedidoRef.id);
+                
+            } catch (error) {
+                console.error('Erro ao criar pedido:', error);
+                alert('Erro ao finalizar pedido. Tente novamente.');
+            }
+        }
+
+        function mostrarConfirmacao(pedidoId) {
+            // Criar modal de confirmação
+            const confirmacaoHTML = `
+                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fa-solid fa-check text-green-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Pedido Realizado!</h3>
+                            <p class="text-gray-600 mb-4">
+                                Seu pedido #${pedidoId.substring(0, 8)} foi recebido com sucesso.
+                            </p>
+                            <p class="text-sm text-gray-500 mb-4">
+                                O WhatsApp foi aberto automaticamente com o resumo do seu pedido. 
+                                Por favor, confirme o envio para finalizar sua encomenda.
+                            </p>
+                            <button onclick="this.closest('.fixed').remove()" 
+                                    class="bg-[--cor-marrom-cta] text-white px-6 py-2 rounded font-semibold">
+                                Continuar Comprando
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', confirmacaoHTML);
+        }
+
+        // ===================================
+        // INICIALIZAÇÃO
+        // ===================================
+
+        function init() {
+            console.log('Inicializando site com Firebase...');
+            
+            // Carregar dados
+            loadCart();
+            carregarPecas();
+
+            // Event Listeners
+            document.getElementById('back-to-gallery').addEventListener('click', () => {
+                const productDetailView = document.getElementById('product-detail-view');
+                productDetailView.classList.add('hidden');
+                currentProduct = null;
+                
+                if (productDetailOrigin === 'page-home') {
+                    showPage('page-home');
+                } else {
+                    document.getElementById('collection-gallery').classList.remove('hidden');
+                }
+            });
+
+            // Seletor de tamanhos
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.size-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    option.classList.add('selected');
+                    selectedSize = option.dataset.size;
+                    
+                    elements.selectedSizeDisplay.textContent = `Tamanho selecionado: ${selectedSize}`;
+                    elements.selectedSizeDisplay.classList.remove('hidden');
+                    elements.addToCartFeedbackEl.textContent = '';
+
+                    // Atualizar estado do botão
+                    updateAddToCartButton();
+                });
+            });
+
+            // Adicionar ao carrinho - ATUALIZADO PARA CORES E DESCONTOS
+            elements.addToCartBtn.addEventListener('click', () => {
+                if (!currentProduct) return;
+
+                if (!selectedSize) {
+                    elements.addToCartFeedbackEl.textContent = 'Por favor, selecione um tamanho.';
+                    setTimeout(() => elements.addToCartFeedbackEl.textContent = '', 2000);
+                    return;
+                }
+
+                // Verificar se precisa selecionar cor
+                if (currentProduct.cores && currentProduct.cores.length > 0 && selectedColor === null) {
+                    elements.addToCartFeedbackEl.textContent = 'Por favor, selecione uma cor.';
+                    setTimeout(() => elements.addToCartFeedbackEl.textContent = '', 2000);
+                    return;
+                }
+
+                const corSelecionada = currentProduct.cores && currentProduct.cores.length > 0 ? 
+                    currentProduct.cores[selectedColor] : null;
+
+                // Verificar estoque da cor selecionada
+                if (corSelecionada && corSelecionada.quantidade <= 0) {
+                    elements.addToCartFeedbackEl.textContent = 'Esta cor está esgotada.';
+                    setTimeout(() => elements.addToCartFeedbackEl.textContent = '', 2000);
+                    return;
+                }
+
+                // Calcular preço final (com desconto se houver)
+                const precoFinal = currentProduct.desconto > 0 ? 
+                    (currentProduct.preco * (1 - currentProduct.desconto / 100)) : currentProduct.preco;
+
+                const cartItemId = `${currentProduct.id}-${selectedSize}-${corSelecionada ? corSelecionada.hex : 'default'}`;
+                const existingItem = cart.find(item => item.cartItemId === cartItemId);
+
+                if (existingItem) {
+                    // Verificar se não excede o estoque
+                    if (corSelecionada && existingItem.quantity >= corSelecionada.quantidade) {
+                        elements.addToCartFeedbackEl.textContent = 'Quantidade máxima em estoque atingida.';
+                        setTimeout(() => elements.addToCartFeedbackEl.textContent = '', 2000);
+                        return;
+                    }
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({
+                        cartItemId: cartItemId,
+                        id: currentProduct.id,
+                        nome: currentProduct.nome,
+                        preco: precoFinal,
+                        image: (currentProduct.imagens && currentProduct.imagens[0]) || 'https://placehold.co/100x100/f1f1f1/ccc?text=Sem+Foto',
+                        tamanho: selectedSize,
+                        cor: corSelecionada ? {
+                            nome: corSelecionada.nome,
+                            hex: corSelecionada.hex
+                        } : null,
+                        quantity: 1
+                    });
+                }
+
+                elements.addToCartFeedbackEl.textContent = 'Peça adicionada à encomenda!';
+                setTimeout(() => elements.addToCartFeedbackEl.textContent = '', 2000);
+                
+                saveCart();
+                openCart();
+            });
+
+            // Carrinho
+            elements.cartButton.addEventListener('click', openCart);
+            elements.closeCartButton.addEventListener('click', closeCart);
+            elements.cartOverlay.addEventListener('click', closeCart);
+
+            // Finalizar pedido
+            elements.finalizarPedidoBtn.addEventListener('click', openCheckoutModal);
+
+            // Modal checkout
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', closeCheckoutModal);
+            });
+
+            // Formulário checkout
+            elements.checkoutForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(elements.checkoutForm);
+                finalizarPedido(formData);
+            });
+
+            elements.cartItemsContainer.addEventListener('click', (e) => {
+                const target = e.target;
+                
+                if (target.classList.contains('cart-qty-change')) {
+                    const cartItemId = target.dataset.id;
+                    const change = parseInt(target.dataset.change);
+                    const item = cart.find(i => i.cartItemId === cartItemId);
+                    if (item) {
+                        item.quantity += change;
+                        if (item.quantity <= 0) {
+                            cart = cart.filter(i => i.cartItemId !== cartItemId);
+                        }
+                        saveCart();
+                    }
+                }
+
+                if (target.classList.contains('cart-remove')) {
+                    const cartItemId = target.dataset.id;
+                    cart = cart.filter(i => i.cartItemId !== cartItemId);
+                    saveCart();
+                }
+            });
+
+            // Acordeão
+            document.querySelectorAll('.accordion-toggle').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('.accordion-icon');
+                    const isHidden = content.classList.contains('hidden');
+                    
+                    if (isHidden) {
+                        content.classList.remove('hidden');
+                        icon.textContent = '−';
+                        icon.classList.add('rotate');
+                    } else {
+                        content.classList.add('hidden');
+                        icon.textContent = '+';
+                        icon.classList.remove('rotate');
+                    }
+                });
+            });
+
+            // Menu Mobile
+            elements.menuButton.addEventListener('click', () => {
+                elements.mobileMenu.classList.toggle('active');
+                elements.menuButton.textContent = elements.mobileMenu.classList.contains('active') ? '✕' : '☰';
+            });
+
+            // Links de navegação
+            document.querySelectorAll('.page-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = e.currentTarget.dataset.page;
+                    if (pageId) {
+                        showPage(pageId);
+                    }
+                    if (elements.mobileMenu.classList.contains('active')) {
+                         elements.mobileMenu.classList.remove('active');
+                         elements.menuButton.textContent = '☰';
+                    }
+                });
+            });
+
+            // Animação de scroll
+            if ('IntersectionObserver' in window) {
+                const elementObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            elementObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                document.querySelectorAll('.scroll-animate').forEach(el => elementObserver.observe(el));
+            }
+
+            console.log('Site inicializado com sucesso!');
+        }
+
+        // Inicializar quando o DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        // ===================================
+        // RASTREAMENTO DE VISITAS E PEDIDOS
+        // ===================================
+
+        // Função para registrar visita
+        function registrarVisita(pagina) {
+            if (typeof db === 'undefined') return;
+            
+            const visitaData = {
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                pagina: pagina,
+                userAgent: navigator.userAgent,
+                dispositivo: window.innerWidth < 768 ? 'mobile' : 
+                            window.innerWidth < 1024 ? 'tablet' : 'desktop',
+                sessaoId: sessionStorage.getItem('sessaoId') || gerarIdSessao(),
+                origem: document.referrer ? 'referral' : 'direct'
+            };
+            
+            // Gerar ID único para a sessão
+            if (!sessionStorage.getItem('sessaoId')) {
+                sessionStorage.setItem('sessaoId', visitaData.sessaoId);
+            }
+            
+            db.collection("visitas").add(visitaData)
+                .catch(error => console.error("Erro ao registrar visita:", error));
+        }
+
+        // Gerar ID único para sessão
+        function gerarIdSessao() {
+            return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Registrar visita na página atual
+        document.addEventListener('DOMContentLoaded', function() {
+            const pagina = window.location.pathname + window.location.search;
+            setTimeout(() => registrarVisita(pagina), 1000);
+        });
+    </script>
+</body>
+</html>

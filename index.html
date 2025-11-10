@@ -498,6 +498,34 @@
             border-color: var(--cor-ouro-acento);
             background-color: #fefce8;
         }
+
+        /* Estilos para o formulário obrigatório */
+        .required-field:invalid {
+            border-color: #f87171;
+        }
+
+        .field-error {
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* Estilos para opções de pagamento */
+        .payment-option input:checked + label {
+            border-color: var(--cor-ouro-acento);
+            background-color: #fefce8;
+        }
+
+        .payment-option input:checked + label .bg-purple-600 {
+            display: block;
+        }
+
+        .payment-label {
+            transition: all 0.2s ease;
+        }
+
+        .payment-error {
+            display: block;
+        }
     </style>
 </head>
 
@@ -719,62 +747,116 @@
             </div>
 
             <form id="checkout-form" class="space-y-4">
-                <!-- Informações do Cliente (Opcionais) -->
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-blue-800 mb-3">Informações de Contato (Opcional)</h3>
+                <!-- Informações do Cliente (OBRIGATÓRIAS) -->
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h3 class="font-semibold text-blue-800 mb-3">Informações de Contato <span class="text-red-500">*</span></h3>
                     
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-sm text-gray-600 mb-1">Nome</label>
-                            <input type="text" name="nome" class="w-full border border-gray-300 rounded px-3 py-2" 
-                                   placeholder="Seu nome completo">
+                            <label class="block text-sm text-gray-600 mb-1">Nome Completo <span class="text-red-500">*</span></label>
+                            <input type="text" name="nome" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                                   placeholder="Seu nome completo" required>
+                            <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
                         </div>
                         
                         <div>
-                            <label class="block text-sm text-gray-600 mb-1">Telefone</label>
-                            <input type="tel" name="telefone" class="w-full border border-gray-300 rounded px-3 py-2" 
-                                   placeholder="(11) 99999-9999">
+                            <label class="block text-sm text-gray-600 mb-1">Telefone <span class="text-red-500">*</span></label>
+                            <input type="tel" name="telefone" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                                   placeholder="(11) 99999-9999" required>
+                            <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
                         </div>
                         
                         <div>
-                            <label class="block text-sm text-gray-600 mb-1">E-mail</label>
-                            <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2" 
-                                   placeholder="seu@email.com">
+                            <label class="block text-sm text-gray-600 mb-1">E-mail <span class="text-red-500">*</span></label>
+                            <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                                   placeholder="seu@email.com" required>
+                            <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Endereço (Opcional) -->
-                <div class="bg-green-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-green-800 mb-3">Endereço de Entrega (Opcional)</h3>
+                <!-- Endereço (OBRIGATÓRIO) -->
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h3 class="font-semibold text-green-800 mb-3">Endereço de Entrega <span class="text-red-500">*</span></h3>
                     
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-sm text-gray-600 mb-1">Rua</label>
-                            <input type="text" name="rua" class="w-full border border-gray-300 rounded px-3 py-2" 
-                                   placeholder="Nome da rua">
+                            <label class="block text-sm text-gray-600 mb-1">Rua <span class="text-red-500">*</span></label>
+                            <input type="text" name="rua" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                                   placeholder="Nome da rua" required>
+                            <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-sm text-gray-600 mb-1">Número</label>
-                                <input type="text" name="numero" class="w-full border border-gray-300 rounded px-3 py-2" 
-                                       placeholder="123">
+                                <label class="block text-sm text-gray-600 mb-1">Número <span class="text-red-500">*</span></label>
+                                <input type="text" name="numero" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                                       placeholder="123" required>
+                                <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
                             </div>
                             
                             <div>
-                                <label class="block text-sm text-gray-600 mb-1">CEP</label>
-                                <input type="text" name="cep" class="w-full border border-gray-300 rounded px-3 py-2" 
-                                       placeholder="01234-567">
+                                <label class="block text-sm text-gray-600 mb-1">CEP <span class="text-red-500">*</span></label>
+                                <input type="text" name="cep" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                                       placeholder="01234-567" required>
+                                <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
                             </div>
                         </div>
                         
                         <div>
-                            <label class="block text-sm text-gray-600 mb-1">Cidade</label>
-                            <input type="text" name="cidade" class="w-full border border-gray-300 rounded px-3 py-2" 
-                                   placeholder="Sua cidade">
+                            <label class="block text-sm text-gray-600 mb-1">Cidade <span class="text-red-500">*</span></label>
+                            <input type="text" name="cidade" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                                   placeholder="Sua cidade" required>
+                            <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- Forma de Pagamento (OBRIGATÓRIA) -->
+                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <h3 class="font-semibold text-purple-800 mb-3">Forma de Pagamento <span class="text-red-500">*</span></h3>
+                    
+                    <div class="space-y-3">
+                        <div class="payment-option">
+                            <input type="radio" id="pix" name="pagamento" value="PIX" class="hidden payment-radio required-field" required>
+                            <label for="pix" class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 payment-label">
+                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                    <div class="w-3 h-3 rounded-full bg-purple-600 hidden"></div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-semibold">PIX</div>
+                                    <div class="text-sm text-gray-600">Pagamento instantâneo</div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="payment-option">
+                            <input type="radio" id="cartao" name="pagamento" value="Cartão de Crédito" class="hidden payment-radio required-field" required>
+                            <label for="cartao" class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 payment-label">
+                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                    <div class="w-3 h-3 rounded-full bg-purple-600 hidden"></div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-semibold">Cartão de Crédito</div>
+                                    <div class="text-sm text-gray-600">Até 12x sem juros (acréscimo de 5.49%)</div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="payment-option">
+                            <input type="radio" id="boleto" name="pagamento" value="Boleto Bancário" class="hidden payment-radio required-field" required>
+                            <label for="boleto" class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 payment-label">
+                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                    <div class="w-3 h-3 rounded-full bg-purple-600 hidden"></div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-semibold">Boleto Bancário</div>
+                                    <div class="text-sm text-gray-600">Pagamento em até 3 dias úteis</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <span class="payment-error text-red-500 text-xs hidden mt-2 block">Selecione uma forma de pagamento</span>
                 </div>
 
                 <!-- Resumo do Pedido -->
@@ -1468,14 +1550,21 @@
             elements.checkoutModal.classList.remove('active');
         }
 
+        // Função para atualizar resumo com base na forma de pagamento
         function updateCheckoutSummary() {
-            let total = 0;
-            let html = '';
+            const formaPagamento = document.querySelector('input[name="pagamento"]:checked');
+            let total = cart.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
+            let taxa = 0;
+            let totalFinal = total;
 
+            if (formaPagamento && formaPagamento.value === 'Cartão de Crédito') {
+                taxa = total * 0.0549; // 5.49% de taxa
+                totalFinal = total + taxa;
+            }
+
+            let html = '';
             cart.forEach(item => {
                 const subtotal = item.preco * item.quantity;
-                total += subtotal;
-
                 html += `
                     <div class="flex justify-between items-center py-2 border-b">
                         <div class="flex-1">
@@ -1492,70 +1581,107 @@
                     </div>
                 `;
             });
+            
+            // Adicionar linha de taxa se houver
+            if (taxa > 0) {
+                html += `
+                    <div class="flex justify-between items-center py-2 border-b text-red-600">
+                        <div class="flex-1">
+                            <p class="font-medium">Taxa cartão de crédito (5.49%)</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold">+ R$ ${taxa.toFixed(2).replace('.',',')}</p>
+                        </div>
+                    </div>
+                `;
+            }
 
             elements.checkoutSummary.innerHTML = html;
-            elements.checkoutTotal.textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
+            elements.checkoutTotal.textContent = `R$ ${totalFinal.toFixed(2).replace('.',',')}`;
         }
 
-        // Função para gerar mensagem do WhatsApp
-        function gerarMensagemWhatsApp(pedidoId, itens, total, cliente) {
-            let mensagem = `🛍️ *NOVO PEDIDO - Laméd vs* 🛍️\n\n`;
-            mensagem += `*Pedido:* #${pedidoId.substring(0, 8).toUpperCase()}\n\n`;
+        // Função para validar formulário
+        function validarFormulario(formData) {
+            let valido = true;
             
-            // Informações do cliente (se fornecidas)
-            if (cliente.nome || cliente.telefone || cliente.email) {
-                mensagem += `*Dados do Cliente:*\n`;
-                if (cliente.nome) mensagem += `• Nome: ${cliente.nome}\n`;
-                if (cliente.telefone) mensagem += `• Telefone: ${cliente.telefone}\n`;
-                if (cliente.email) mensagem += `• E-mail: ${cliente.email}\n`;
-                mensagem += `\n`;
-            }
+            // Campos obrigatórios
+            const camposObrigatorios = ['nome', 'telefone', 'email', 'rua', 'numero', 'cep', 'cidade', 'pagamento'];
             
-            // Endereço (se fornecido)
-            if (cliente.endereco.rua || cliente.endereco.cidade) {
-                mensagem += `*Endereço de Entrega:*\n`;
-                if (cliente.endereco.rua) mensagem += `• Rua: ${cliente.endereco.rua}`;
-                if (cliente.endereco.numero) mensagem += `, ${cliente.endereco.numero}`;
-                if (cliente.endereco.rua || cliente.endereco.numero) mensagem += `\n`;
-                if (cliente.endereco.cidade) mensagem += `• Cidade: ${cliente.endereco.cidade}\n`;
-                if (cliente.endereco.cep) mensagem += `• CEP: ${cliente.endereco.cep}\n`;
-                mensagem += `\n`;
-            }
-            
-            // Itens do pedido
-            mensagem += `*Itens do Pedido:*\n`;
-            itens.forEach((item, index) => {
-                mensagem += `${index + 1}. ${item.nome}\n`;
-                mensagem += `   • Tamanho: ${item.tamanho}\n`;
-                if (item.cor) mensagem += `   • Cor: ${item.cor.nome}\n`;
-                mensagem += `   • Quantidade: ${item.quantity}\n`;
-                mensagem += `   • Preço: R$ ${(item.preco * item.quantity).toFixed(2).replace('.', ',')}\n\n`;
+            // Validar campos de texto
+            camposObrigatorios.forEach(campo => {
+                const valor = formData.get(campo);
+                const fieldElement = elements.checkoutForm.querySelector(`[name="${campo}"]`);
+                const errorElement = fieldElement ? fieldElement.nextElementSibling : null;
+                
+                if (!valor || valor.trim() === '') {
+                    valido = false;
+                    if (fieldElement) {
+                        fieldElement.classList.add('border-red-500');
+                    }
+                    if (errorElement && errorElement.classList.contains('field-error')) {
+                        errorElement.classList.remove('hidden');
+                    }
+                } else {
+                    if (fieldElement) {
+                        fieldElement.classList.remove('border-red-500');
+                    }
+                    if (errorElement && errorElement.classList.contains('field-error')) {
+                        errorElement.classList.add('hidden');
+                    }
+                }
             });
             
-            // Total
-            mensagem += `*VALOR TOTAL: R$ ${total.toFixed(2).replace('.', ',')}*\n\n`;
+            // Validar pagamento especificamente
+            const pagamentoSelecionado = formData.get('pagamento');
+            const paymentError = document.querySelector('.payment-error');
+            if (!pagamentoSelecionado) {
+                valido = false;
+                if (paymentError) {
+                    paymentError.classList.remove('hidden');
+                }
+            } else {
+                if (paymentError) {
+                    paymentError.classList.add('hidden');
+                }
+            }
             
-            mensagem += `_Este pedido foi gerado automaticamente através do site._`;
-            
-            return mensagem;
+            return valido;
         }
 
+        // Atualizar a função finalizarPedido
         async function finalizarPedido(formData) {
-            // Coletar dados do cliente (todos opcionais)
-            const cliente = {
-                nome: formData.get('nome') || '',
-                telefone: formData.get('telefone') || '',
-                email: formData.get('email') || '',
-                endereco: {
-                    rua: formData.get('rua') || '',
-                    numero: formData.get('numero') || '',
-                    cidade: formData.get('cidade') || '',
-                    cep: formData.get('cep') || ''
+            // Validar formulário primeiro
+            if (!validarFormulario(formData)) {
+                // Scroll para o primeiro erro
+                const primeiroErro = elements.checkoutForm.querySelector('.border-red-500, .payment-error:not(.hidden)');
+                if (primeiroErro) {
+                    primeiroErro.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
+                return;
+            }
+
+            // Coletar dados do cliente (agora obrigatórios)
+            const cliente = {
+                nome: formData.get('nome'),
+                telefone: formData.get('telefone'),
+                email: formData.get('email'),
+                endereco: {
+                    rua: formData.get('rua'),
+                    numero: formData.get('numero'),
+                    cidade: formData.get('cidade'),
+                    cep: formData.get('cep')
+                },
+                pagamento: formData.get('pagamento')
             };
 
-            // Calcular total
-            const total = cart.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
+            // Calcular total (com taxa para cartão)
+            let total = cart.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
+            let taxa = 0;
+            
+            if (cliente.pagamento === 'Cartão de Crédito') {
+                taxa = total * 0.0549; // 5.49% de taxa
+                total += taxa;
+            }
 
             try {
                 // Criar pedido no Firebase
@@ -1564,12 +1690,14 @@
                     produtos: cart,
                     cliente: cliente,
                     total: total,
+                    taxa: taxa,
+                    formaPagamento: cliente.pagamento,
                     data: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Gerar mensagem para WhatsApp
-                const mensagemWhatsApp = gerarMensagemWhatsApp(pedidoRef.id, cart, total, cliente);
+                // Gerar mensagem para WhatsApp (atualizada com forma de pagamento e taxa)
+                const mensagemWhatsApp = gerarMensagemWhatsApp(pedidoRef.id, cart, total, cliente, taxa);
                 const urlWhatsApp = `https://wa.me/5527999287657?text=${encodeURIComponent(mensagemWhatsApp)}`;
                 
                 // Limpar carrinho
@@ -1589,6 +1717,51 @@
                 console.error('Erro ao criar pedido:', error);
                 alert('Erro ao finalizar pedido. Tente novamente.');
             }
+        }
+
+        // Atualizar a função gerarMensagemWhatsApp para incluir forma de pagamento e taxa
+        function gerarMensagemWhatsApp(pedidoId, itens, total, cliente, taxa = 0) {
+            let mensagem = `🛍️ *NOVO PEDIDO - Laméd vs* 🛍️\n\n`;
+            mensagem += `*Pedido:* #${pedidoId.substring(0, 8).toUpperCase()}\n\n`;
+            
+            // Informações do cliente
+            mensagem += `*Dados do Cliente:*\n`;
+            mensagem += `• Nome: ${cliente.nome}\n`;
+            mensagem += `• Telefone: ${cliente.telefone}\n`;
+            mensagem += `• E-mail: ${cliente.email}\n`;
+            mensagem += `\n`;
+            
+            // Endereço
+            mensagem += `*Endereço de Entrega:*\n`;
+            mensagem += `• Rua: ${cliente.endereco.rua}, ${cliente.endereco.numero}\n`;
+            mensagem += `• Cidade: ${cliente.endereco.cidade}\n`;
+            mensagem += `• CEP: ${cliente.endereco.cep}\n`;
+            mensagem += `\n`;
+            
+            // Forma de pagamento
+            mensagem += `*Forma de Pagamento:* ${cliente.pagamento}\n`;
+            if (taxa > 0) {
+                mensagem += `• *Taxa de 5.49% aplicada: R$ ${taxa.toFixed(2).replace('.', ',')}*\n`;
+            }
+            mensagem += `\n`;
+            
+            // Itens do pedido
+            mensagem += `*Itens do Pedido:*\n`;
+            itens.forEach((item, index) => {
+                const subtotal = item.preco * item.quantity;
+                mensagem += `${index + 1}. ${item.nome}\n`;
+                mensagem += `   • Tamanho: ${item.tamanho}\n`;
+                if (item.cor) mensagem += `   • Cor: ${item.cor.nome}\n`;
+                mensagem += `   • Quantidade: ${item.quantity}\n`;
+                mensagem += `   • Preço: R$ ${subtotal.toFixed(2).replace('.', ',')}\n\n`;
+            });
+            
+            // Total
+            mensagem += `*VALOR TOTAL: R$ ${total.toFixed(2).replace('.', ',')}*\n\n`;
+            
+            mensagem += `_Este pedido foi gerado automaticamente através do site._`;
+            
+            return mensagem;
         }
 
         function mostrarConfirmacao(pedidoId) {
@@ -1746,6 +1919,24 @@
                 e.preventDefault();
                 const formData = new FormData(elements.checkoutForm);
                 finalizarPedido(formData);
+            });
+
+            // Event listeners para opções de pagamento
+            document.querySelectorAll('.payment-radio').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    // Atualizar visual da seleção
+                    document.querySelectorAll('.payment-label').forEach(label => {
+                        label.classList.remove('border-[--cor-ouro-acento]', 'bg-amber-50');
+                    });
+                    
+                    if (this.checked) {
+                        const label = this.nextElementSibling;
+                        label.classList.add('border-[--cor-ouro-acento]', 'bg-amber-50');
+                    }
+                    
+                    // Atualizar resumo com base na forma de pagamento
+                    updateCheckoutSummary();
+                });
             });
 
             elements.cartItemsContainer.addEventListener('click', (e) => {

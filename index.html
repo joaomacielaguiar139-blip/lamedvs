@@ -779,159 +779,209 @@
     </div>
 
     <!-- Modal de Finalização de Pedido -->
-    <div id="checkout-modal" class="modal">
-        <div class="modal-content max-w-md">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold">Finalizar Pedido</h2>
-                <button class="close-modal text-2xl">&times;</button>
+<div id="checkout-modal" class="modal">
+    <div class="modal-content max-w-md">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-semibold">Finalizar Pedido</h2>
+            <button class="close-modal text-2xl">&times;</button>
+        </div>
+
+        <form id="checkout-form" class="space-y-4">
+            <!-- Informações do Cliente (OBRIGATÓRIAS) -->
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h3 class="font-semibold text-blue-800 mb-3">Informações de Contato <span class="text-red-500">*</span></h3>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Nome Completo <span class="text-red-500">*</span></label>
+                        <input type="text" name="nome" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                               placeholder="Seu nome completo" required>
+                        <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Telefone <span class="text-red-500">*</span></label>
+                        <input type="tel" name="telefone" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                               placeholder="(11) 99999-9999" required>
+                        <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">E-mail <span class="text-red-500">*</span></label>
+                        <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                               placeholder="seu@email.com" required>
+                        <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
+                    </div>
+                </div>
             </div>
 
-            <form id="checkout-form" class="space-y-4">
-                <!-- Informações do Cliente (OBRIGATÓRIAS) -->
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <h3 class="font-semibold text-blue-800 mb-3">Informações de Contato <span class="text-red-500">*</span></h3>
+            <!-- Endereço (OBRIGATÓRIO) -->
+            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                <h3 class="font-semibold text-green-800 mb-3">Endereço de Entrega <span class="text-red-500">*</span></h3>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Rua <span class="text-red-500">*</span></label>
+                        <input type="text" name="rua" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                               placeholder="Nome da rua" required>
+                        <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
+                    </div>
                     
-                    <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-sm text-gray-600 mb-1">Nome Completo <span class="text-red-500">*</span></label>
-                            <input type="text" name="nome" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
-                                   placeholder="Seu nome completo" required>
+                            <label class="block text-sm text-gray-600 mb-1">Número <span class="text-red-500">*</span></label>
+                            <input type="text" name="numero" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                                   placeholder="123" required>
                             <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
                         </div>
                         
                         <div>
-                            <label class="block text-sm text-gray-600 mb-1">Telefone <span class="text-red-500">*</span></label>
-                            <input type="tel" name="telefone" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
-                                   placeholder="(11) 99999-9999" required>
-                            <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm text-gray-600 mb-1">E-mail <span class="text-red-500">*</span></label>
-                            <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
-                                   placeholder="seu@email.com" required>
+                            <label class="block text-sm text-gray-600 mb-1">CEP <span class="text-red-500">*</span></label>
+                            <input type="text" name="cep" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                                   placeholder="01234-567" required>
                             <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
                         </div>
                     </div>
-                </div>
-
-                <!-- Endereço (OBRIGATÓRIO) -->
-                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h3 class="font-semibold text-green-800 mb-3">Endereço de Entrega <span class="text-red-500">*</span></h3>
                     
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-sm text-gray-600 mb-1">Rua <span class="text-red-500">*</span></label>
-                            <input type="text" name="rua" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
-                                   placeholder="Nome da rua" required>
-                            <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-sm text-gray-600 mb-1">Número <span class="text-red-500">*</span></label>
-                                <input type="text" name="numero" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
-                                       placeholder="123" required>
-                                <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Cidade <span class="text-red-500">*</span></label>
+                        <input type="text" name="cidade" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
+                               placeholder="Sua cidade" required>
+                        <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forma de Pagamento (OBRIGATÓRIA) -->
+            <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                <h3 class="font-semibold text-purple-800 mb-3">Forma de Pagamento <span class="text-red-500">*</span></h3>
+                
+                <div class="space-y-3">
+                    <div class="payment-option">
+                        <input type="radio" id="pix" name="pagamento" value="PIX" class="hidden payment-radio required-field" required>
+                        <label for="pix" class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 payment-label">
+                            <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                <div class="w-3 h-3 rounded-full bg-purple-600 hidden"></div>
                             </div>
-                            
-                            <div>
-                                <label class="block text-sm text-gray-600 mb-1">CEP <span class="text-red-500">*</span></label>
-                                <input type="text" name="cep" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
-                                       placeholder="01234-567" required>
-                                <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
+                            <div class="flex-1">
+                                <div class="font-semibold">PIX</div>
+                                <div class="text-sm text-gray-600">Pagamento instantâneo - 5% de desconto</div>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="payment-option">
+                        <input type="radio" id="cartao" name="pagamento" value="Cartão de Crédito" class="hidden payment-radio required-field" required>
+                        <label for="cartao" class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 payment-label">
+                            <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                <div class="w-3 h-3 rounded-full bg-purple-600 hidden"></div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-semibold">Cartão de Crédito</div>
+                                <div class="text-sm text-gray-600">
+                                    <span class="text-green-600 font-semibold">2x SEM JUROS</span> - Nós cobrimos as taxas!
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Seletor de parcelas -->
+                    <div id="parcelamento-container" class="hidden mt-3 p-3 bg-gray-50 rounded-lg border">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Parcelamento:</label>
+                        <select id="parcelas-select" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <!-- Opções serão preenchidas dinamicamente -->
+                        </select>
+                        <div id="parcela-info" class="text-xs text-gray-600 mt-2">
+                            <div class="text-green-600 font-semibold">✨ Promoção Especial: 2x SEM JUROS!</div>
+                            <div class="text-gray-500">A Laméd vs assume as taxas das 2 primeiras parcelas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-option">
+                        <input type="radio" id="boleto" name="pagamento" value="Boleto Bancário" class="hidden payment-radio required-field" required>
+                        <label for="boleto" class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 payment-label">
+                            <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                <div class="w-3 h-3 rounded-full bg-purple-600 hidden"></div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-semibold">Boleto Bancário</div>
+                                <div class="text-sm text-gray-600">Pagamento em até 3 dias úteis</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <span class="payment-error text-red-500 text-xs hidden mt-2 block">Selecione uma forma de pagamento</span>
+            </div>
+
+            <!-- MENSAGEM DE PRAZO DE PRODUÇÃO -->
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <i class="fa-solid fa-clock text-amber-600 mt-1 mr-3 text-lg"></i>
+                    <div>
+                        <h4 class="font-semibold text-amber-800 text-sm uppercase tracking-wide mb-2">✨ Produção Sob Demanda</h4>
+                        <div class="space-y-2 text-amber-700 text-sm">
+                            <div class="flex items-start">
+                                <i class="fa-solid fa-calendar-check text-amber-600 mt-0.5 mr-2"></i>
+                                <div>
+                                    <strong>Prazo de Produção:</strong> até 20 dias úteis<br>
+                                    <span class="text-xs text-amber-600">(Cada peça é confeccionada especialmente para você)</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fa-solid fa-truck text-amber-600 mt-0.5 mr-2"></i>
+                                <div>
+                                    <strong>Envio:</strong> + Prazo dos Correios<br>
+                                    <span class="text-xs text-amber-600">(Após conclusão da produção)</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fa-solid fa-bell text-amber-600 mt-0.5 mr-2"></i>
+                                <div>
+                                    <strong>Acompanhamento:</strong> Atualizações em cada etapa<br>
+                                    <span class="text-xs text-amber-600">(Você receberá notificações do progresso)</span>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div>
-                            <label class="block text-sm text-gray-600 mb-1">Cidade <span class="text-red-500">*</span></label>
-                            <input type="text" name="cidade" class="w-full border border-gray-300 rounded px-3 py-2 required-field" 
-                                   placeholder="Sua cidade" required>
-                            <span class="field-error text-red-500 text-xs hidden">Campo obrigatório</span>
-                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Forma de Pagamento (OBRIGATÓRIA) -->
-                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                    <h3 class="font-semibold text-purple-800 mb-3">Forma de Pagamento <span class="text-red-500">*</span></h3>
-                    
-                    <div class="space-y-3">
-                        <div class="payment-option">
-                            <input type="radio" id="pix" name="pagamento" value="PIX" class="hidden payment-radio required-field" required>
-                            <label for="pix" class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 payment-label">
-                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                                    <div class="w-3 h-3 rounded-full bg-purple-600 hidden"></div>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="font-semibold">PIX</div>
-                                    <div class="text-sm text-gray-600">Pagamento instantâneo</div>
-                                </div>
-                            </label>
-                        </div>
-                        
-                        <div class="payment-option">
-                            <input type="radio" id="cartao" name="pagamento" value="Cartão de Crédito" class="hidden payment-radio required-field" required>
-                            <label for="cartao" class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 payment-label">
-                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                                    <div class="w-3 h-3 rounded-full bg-purple-600 hidden"></div>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="font-semibold">Cartão de Crédito</div>
-                                    <div class="text-sm text-gray-600">Parcelamento com juros</div>
-                                </div>
-                            </label>
-                        </div>
-
-                        <!-- Adicionar seletor de parcelas (inicialmente escondido) -->
-                        <div id="parcelamento-container" class="hidden mt-3 p-3 bg-gray-50 rounded-lg border">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Parcelamento:</label>
-                            <select id="parcelas-select" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                                <option value="1">1x de R$ 0,00 (à vista)</option>
-                            </select>
-                            <div id="parcela-info" class="text-xs text-gray-600 mt-2"></div>
-                        </div>
-                        
-                        <div class="payment-option">
-                            <input type="radio" id="boleto" name="pagamento" value="Boleto Bancário" class="hidden payment-radio required-field" required>
-                            <label for="boleto" class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 payment-label">
-                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                                    <div class="w-3 h-3 rounded-full bg-purple-600 hidden"></div>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="font-semibold">Boleto Bancário</div>
-                                    <div class="text-sm text-gray-600">Pagamento em até 3 dias úteis</div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                    <span class="payment-error text-red-500 text-xs hidden mt-2 block">Selecione uma forma de pagamento</span>
+            <!-- Resumo do Pedido -->
+            <div class="border-t pt-4">
+                <h3 class="font-semibold mb-3">Resumo do Pedido</h3>
+                <div id="checkout-summary">
+                    <!-- Itens serão inseridos aqui -->
                 </div>
-
-                <!-- Resumo do Pedido -->
-                <div class="border-t pt-4">
-                    <h3 class="font-semibold mb-3">Resumo do Pedido</h3>
-                    <div id="checkout-summary">
-                        <!-- Itens serão inseridos aqui -->
-                    </div>
-                    <div class="flex justify-between items-center mt-3 pt-3 border-t">
-                        <span class="font-semibold">Total:</span>
-                        <span id="checkout-total" class="text-xl font-bold text-[--cor-marrom-cta]">R$ 0,00</span>
-                    </div>
+                <div class="flex justify-between items-center mt-3 pt-3 border-t">
+                    <span class="font-semibold">Total:</span>
+                    <span id="checkout-total" class="text-xl font-bold text-[--cor-marrom-cta]">R$ 0,00</span>
                 </div>
-
-                <!-- Botões -->
-                <div class="flex gap-3 pt-4">
-                    <button type="button" class="close-modal flex-1 bg-gray-300 text-gray-700 py-2 rounded">
-                        Voltar
-                    </button>
-                    <button type="submit" class="flex-1 bg-[--cor-marrom-cta] text-white py-2 rounded font-semibold">
-                        Finalizar Pedido
-                    </button>
+                
+                <!-- Informação de desconto PIX -->
+                <div id="pix-discount-info" class="hidden mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
+                    <i class="fa-solid fa-tag mr-1"></i>
+                    <strong>Desconto PIX aplicado:</strong> 5% de desconto
                 </div>
-            </form>
-        </div>
+                
+                <!-- Informação de parcelamento -->
+                <div id="parcelamento-info" class="hidden mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-700">
+                    <i class="fa-solid fa-credit-card mr-1"></i>
+                    <strong>Parcelamento:</strong> <span id="parcelamento-text"></span>
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex gap-3 pt-4">
+                <button type="button" class="close-modal flex-1 bg-gray-300 text-gray-700 py-2 rounded">
+                    Voltar
+                </button>
+                <button type="submit" class="flex-1 bg-[--cor-marrom-cta] text-white py-2 rounded font-semibold">
+                    Finalizar Pedido
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
     <!-- RODAPÉ -->
     <footer id="contato" class="bg-gray-100 text-gray-700 py-12 px-4">
@@ -1708,10 +1758,14 @@
                 return;
             }
 
-            // Resetar parcelamento
+            // Atualizar resumo primeiro
+            updateCheckoutSummary();
+            
+            // Resetar seleções de pagamento
+            resetTotalToOriginal();
             toggleParcelamento(false);
             
-            updateCheckoutSummary();
+            // Abrir modal
             elements.checkoutModal.classList.add('active');
             closeCart();
         }
@@ -1720,57 +1774,326 @@
             elements.checkoutModal.classList.remove('active');
         }
 
-        // Função para atualizar resumo com base na forma de pagamento
+        // ===================================
+        // FUNÇÕES DE CHECKOUT CORRIGIDAS
+        // ===================================
+
+        // ADICIONE ESTA FUNÇÃO (FALTANTE NO CÓDIGO)
         function updateCheckoutSummary() {
-            const formaPagamento = document.querySelector('input[name="pagamento"]:checked');
-            let subtotal = cart.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
-            let taxa = 0;
-            let totalFinal = subtotal;
-
-            // Se for cartão, usar o valor das parcelas
-            if (formaPagamento && formaPagamento.value === 'Cartão de Crédito') {
-                const parcelaSelecionada = obterParcelaSelecionada(subtotal);
-                totalFinal = parcelaSelecionada.valorTotal;
-                taxa = totalFinal - subtotal;
-            }
-
-            let html = '';
-            cart.forEach(item => {
-                const itemSubtotal = item.preco * item.quantity;
-                html += `
-                    <div class="flex justify-between items-center py-2 border-b">
-                        <div class="flex-1">
-                            <p class="font-medium">${item.nome}</p>
-                            <p class="text-sm text-gray-600">
-                                ${item.tamanho ? `Tamanho: ${item.tamanho} • ` : ''}
-                                ${item.cor ? `Cor: ${item.cor.nome} • ` : ''}
-                                Qtd: ${item.quantity}
-                            </p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-semibold">${formatarReal(itemSubtotal)}</p>
+            const checkoutSummary = document.getElementById('checkout-summary');
+            const checkoutTotal = document.getElementById('checkout-total');
+            
+            if (!checkoutSummary || !checkoutTotal) return;
+            
+            checkoutSummary.innerHTML = '';
+            
+            let subtotal = 0;
+            
+            cart.forEach((item, index) => {
+                const itemTotal = item.preco * item.quantity;
+                subtotal += itemTotal;
+                
+                const itemEl = document.createElement('div');
+                itemEl.className = 'flex justify-between items-center py-2 border-b';
+                itemEl.innerHTML = `
+                    <div class="flex-1">
+                        <div class="font-medium">${item.nome}</div>
+                        <div class="text-xs text-gray-500">
+                            Tamanho: ${item.tamanho}
+                            ${item.cor ? ` • Cor: ${item.cor.nome}` : ''}
+                            • Qtd: ${item.quantity}
                         </div>
                     </div>
+                    <div class="text-sm font-semibold">${formatarReal(itemTotal)}</div>
                 `;
+                checkoutSummary.appendChild(itemEl);
             });
             
-            // Adicionar linha de taxa se houver
-            if (taxa > 0) {
-                const taxaPercentual = (TAXA_JUROS * 100).toFixed(2);
-                html += `
-                    <div class="flex justify-between items-center py-2 border-b text-red-600">
-                        <div class="flex-1">
-                            <p class="font-medium">Taxa do cartão (${taxaPercentual}%)</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-semibold">+ ${formatarReal(taxa)}</p>
-                        </div>
-                    </div>
-                `;
+            // Atualizar total base
+            checkoutTotal.textContent = formatarReal(subtotal);
+            
+            // Aplicar desconto PIX se selecionado
+            const pixSelected = document.querySelector('input[name="pagamento"]:checked')?.value === 'PIX';
+            if (pixSelected) {
+                applyPixDiscount();
             }
+            
+            // Atualizar opções de parcelamento se cartão selecionado
+            const cartaoSelected = document.querySelector('input[name="pagamento"]:checked')?.value === 'Cartão de Crédito';
+            if (cartaoSelected) {
+                updateParcelamentoOptions();
+                updateParcelamentoInfo();
+            }
+        }
 
-            elements.checkoutSummary.innerHTML = html;
-            elements.checkoutTotal.textContent = formatarReal(totalFinal);
+        // CORREÇÃO DA FUNÇÃO updateParcelamentoOptions
+        function updateParcelamentoOptions() {
+            const parcelasSelect = document.getElementById('parcelas-select');
+            if (!parcelasSelect) return;
+            
+            const total = getCartTotal();
+            
+            parcelasSelect.innerHTML = '';
+            
+            // Opções de parcelamento corrigidas
+            const parcelas = [
+                { vezes: 1, juros: 0, texto: `1x de ${formatarReal(total)} SEM JUROS (à vista)` },
+                { vezes: 2, juros: 0, texto: `2x de ${formatarReal(total / 2)} SEM JUROS` }
+            ];
+            
+            // Adicionar mais parcelas com juros progressivos
+            for (let i = 3; i <= 6; i++) {
+                const taxaJuros = 0.02 * (i - 2); // Juros progressivos: 2%, 4%, 6%, 8%
+                const valorComJuros = total * (1 + taxaJuros);
+                const valorParcela = valorComJuros / i;
+                
+                parcelas.push({
+                    vezes: i,
+                    juros: taxaJuros,
+                    texto: `${i}x de ${formatarReal(valorParcela)}`
+                });
+            }
+            
+            parcelas.forEach((parcela) => {
+                const option = document.createElement('option');
+                option.value = parcela.vezes;
+                option.textContent = parcela.texto;
+                option.dataset.juros = parcela.juros;
+                parcelasSelect.appendChild(option);
+            });
+            
+            // Selecionar 2x por padrão (promoção)
+            parcelasSelect.value = '2';
+        }
+
+        // CORREÇÃO DA FUNÇÃO updateParcelamentoInfo
+        function updateParcelamentoInfo() {
+            const parcelasSelect = document.getElementById('parcelas-select');
+            const parcelamentoInfo = document.getElementById('parcelamento-info');
+            const parcelamentoText = document.getElementById('parcelamento-text');
+            
+            if (!parcelasSelect || !parcelamentoInfo || !parcelamentoText) return;
+            
+            const selectedOption = parcelasSelect.options[parcelasSelect.selectedIndex];
+            const vezes = parseInt(selectedOption.value);
+            const juros = parseFloat(selectedOption.dataset.juros);
+            const total = getCartTotal();
+            
+            let valorParcela, valorTotal;
+            
+            if (juros > 0) {
+                valorTotal = total * (1 + juros);
+                valorParcela = valorTotal / vezes;
+                const taxaPercentual = (juros * 100).toFixed(1);
+                parcelamentoText.textContent = `${vezes}x de ${formatarReal(valorParcela)} (Total: ${formatarReal(valorTotal)} - ${taxaPercentual}% de juros)`;
+            } else {
+                valorParcela = total / vezes;
+                if (vezes === 2) {
+                    parcelamentoText.textContent = `2x de ${formatarReal(valorParcela)} SEM JUROS - Taxas cobertas pela Laméd vs!`;
+                } else if (vezes === 1) {
+                    parcelamentoText.textContent = `1x de ${formatarReal(valorParcela)} SEM JUROS (à vista)`;
+                } else {
+                    parcelamentoText.textContent = `${vezes}x de ${formatarReal(valorParcela)} SEM JUROS`;
+                }
+            }
+            
+            parcelamentoInfo.classList.remove('hidden');
+            
+            // Atualizar o total mostrado no checkout
+            const checkoutTotal = document.getElementById('checkout-total');
+            if (checkoutTotal) {
+                const valorFinal = juros > 0 ? valorTotal : total;
+                checkoutTotal.textContent = formatarReal(valorFinal);
+            }
+        }
+
+        // CORREÇÃO DA FUNÇÃO applyPixDiscount
+        function applyPixDiscount() {
+            const total = getCartTotal();
+            const discount = total * 0.05; // 5% de desconto
+            const discountedTotal = total - discount;
+            
+            // Atualizar o total mostrado
+            const checkoutTotal = document.getElementById('checkout-total');
+            if (checkoutTotal) {
+                checkoutTotal.textContent = formatarReal(discountedTotal);
+            }
+        }
+
+        // CORREÇÃO DA FUNÇÃO resetTotalToOriginal
+        function resetTotalToOriginal() {
+            const subtotal = getCartTotal();
+            const checkoutTotal = document.getElementById('checkout-total');
+            if (checkoutTotal) {
+                checkoutTotal.textContent = formatarReal(subtotal);
+            }
+        }
+
+        // CORREÇÃO: Adicionar esta função para obter o total do carrinho
+        function getCartTotal() {
+            return cart.reduce((total, item) => total + (item.preco * item.quantity), 0);
+        }
+
+        // CORREÇÃO: Melhorar a validação do formulário
+        function validarFormulario(formData) {
+            let valido = true;
+            
+            // Campos obrigatórios
+            const camposObrigatorios = ['nome', 'telefone', 'email', 'rua', 'numero', 'cep', 'cidade', 'pagamento'];
+            
+            // Validar campos de texto
+            camposObrigatorios.forEach(campo => {
+                const valor = formData.get(campo);
+                const fieldElement = elements.checkoutForm.querySelector(`[name="${campo}"]`);
+                const errorElement = fieldElement ? fieldElement.nextElementSibling : null;
+                
+                if (!valor || valor.trim() === '') {
+                    valido = false;
+                    if (fieldElement) {
+                        fieldElement.classList.add('border-red-500');
+                    }
+                    if (errorElement && errorElement.classList.contains('field-error')) {
+                        errorElement.classList.remove('hidden');
+                    }
+                } else {
+                    if (fieldElement) {
+                        fieldElement.classList.remove('border-red-500');
+                    }
+                    if (errorElement && errorElement.classList.contains('field-error')) {
+                        errorElement.classList.add('hidden');
+                    }
+                }
+            });
+            
+            // Validação específica para email
+            const email = formData.get('email');
+            const emailField = elements.checkoutForm.querySelector('[name="email"]');
+            const emailError = emailField ? emailField.nextElementSibling : null;
+            
+            if (email && !isValidEmail(email)) {
+                valido = false;
+                if (emailField) {
+                    emailField.classList.add('border-red-500');
+                }
+                if (emailError && emailError.classList.contains('field-error')) {
+                    emailError.textContent = 'Email inválido';
+                    emailError.classList.remove('hidden');
+                }
+            }
+            
+            // Validar pagamento especificamente
+            const pagamentoSelecionado = formData.get('pagamento');
+            const paymentError = document.querySelector('.payment-error');
+            if (!pagamentoSelecionado) {
+                valido = false;
+                if (paymentError) {
+                    paymentError.classList.remove('hidden');
+                }
+            } else {
+                if (paymentError) {
+                    paymentError.classList.add('hidden');
+                }
+            }
+            
+            return valido;
+        }
+
+        // Função auxiliar para validar email
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // CORREÇÃO: Adicionar evento para atualizar visual das opções de pagamento
+        function setupPaymentOptions() {
+            const paymentRadios = document.querySelectorAll('.payment-radio');
+            
+            paymentRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    // Atualizar visual das labels
+                    document.querySelectorAll('.payment-label').forEach(label => {
+                        label.classList.remove('border-[--cor-ouro-acento]', 'bg-amber-50');
+                        const checkIcon = label.querySelector('.bg-purple-600');
+                        if (checkIcon) {
+                            checkIcon.style.display = 'none';
+                        }
+                    });
+                    
+                    // Marcar a label selecionada
+                    if (this.checked) {
+                        const label = this.nextElementSibling;
+                        label.classList.add('border-[--cor-ouro-acento]', 'bg-amber-50');
+                        const checkIcon = label.querySelector('.bg-purple-600');
+                        if (checkIcon) {
+                            checkIcon.style.display = 'block';
+                        }
+                    }
+                    
+                    // Mostrar/ocultar parcelamento
+                    if (this.value === 'Cartão de Crédito') {
+                        toggleParcelamento(true);
+                        resetTotalToOriginal(); // Resetar para mostrar total sem desconto
+                    } else {
+                        toggleParcelamento(false);
+                        if (this.value === 'PIX') {
+                            applyPixDiscount();
+                        } else {
+                            resetTotalToOriginal();
+                        }
+                    }
+                });
+            });
+            
+            // Evento para mudança de parcelas
+            const parcelasSelect = document.getElementById('parcelas-select');
+            if (parcelasSelect) {
+                parcelasSelect.addEventListener('change', function() {
+                    updateParcelamentoInfo();
+                });
+            }
+        }
+
+        // GERENCIAMENTO DE PAGAMENTOS E PARCELAMENTO
+        function setupPaymentOptions() {
+            const paymentRadios = document.querySelectorAll('.payment-radio');
+            const parcelamentoContainer = document.getElementById('parcelamento-container');
+            const parcelasSelect = document.getElementById('parcelas-select');
+            const pixDiscountInfo = document.getElementById('pix-discount-info');
+            const parcelamentoInfo = document.getElementById('parcelamento-info');
+            const parcelamentoText = document.getElementById('parcelamento-text');
+            
+            // Configurar eventos dos radios de pagamento
+            paymentRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updatePaymentUI(this.value);
+                });
+            });
+            
+            // Evento para mudança de parcelas
+            parcelasSelect.addEventListener('change', updateParcelamentoInfo);
+        }
+
+        function updatePaymentUI(selectedPayment) {
+            const parcelamentoContainer = document.getElementById('parcelamento-container');
+            const pixDiscountInfo = document.getElementById('pix-discount-info');
+            const parcelamentoInfo = document.getElementById('parcelamento-info');
+            
+            // Resetar todas as informações
+            pixDiscountInfo.classList.add('hidden');
+            parcelamentoInfo.classList.add('hidden');
+            parcelamentoContainer.classList.add('hidden');
+            
+            // Resetar total para valor original (caso tenha aplicado desconto PIX)
+            resetTotalToOriginal();
+            
+            if (selectedPayment === 'Cartão de Crédito') {
+                parcelamentoContainer.classList.remove('hidden');
+                updateParcelamentoOptions();
+                updateParcelamentoInfo();
+            } else if (selectedPayment === 'PIX') {
+                pixDiscountInfo.classList.remove('hidden');
+                applyPixDiscount();
+            }
         }
 
         // Função para validar formulário
@@ -2104,30 +2427,8 @@
                 finalizarPedido(formData);
             });
 
-            // Event listeners para opções de pagamento
-            document.querySelectorAll('input[name="pagamento"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    // Mostrar/ocultar parcelamento baseado na seleção
-                    if (this.value === 'Cartão de Crédito') {
-                        toggleParcelamento(true);
-                    } else {
-                        toggleParcelamento(false);
-                    }
-                    
-                    // Atualizar visual da seleção
-                    document.querySelectorAll('.payment-label').forEach(label => {
-                        label.classList.remove('border-[--cor-ouro-acento]', 'bg-amber-50');
-                    });
-                    
-                    if (this.checked) {
-                        const label = this.nextElementSibling;
-                        label.classList.add('border-[--cor-ouro-acento]', 'bg-amber-50');
-                    }
-                    
-                    // Atualizar resumo com base na forma de pagamento
-                    updateCheckoutSummary();
-                });
-            });
+            // INICIALIZAR OPÇÕES DE PAGAMENTO (ADICIONE ESTA LINHA)
+            setupPaymentOptions();
 
             // Event listener para mudança no número de parcelas
             document.getElementById('parcelas-select').addEventListener('change', function() {
@@ -2214,7 +2515,7 @@
             console.log('Site inicializado com sucesso!');
         }
 
-                // Inicializar quando o DOM estiver pronto
+        // Inicializar quando o DOM estiver pronto
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {

@@ -2214,12 +2214,64 @@
             console.log('Site inicializado com sucesso!');
         }
 
-        // Inicializar quando o DOM estiver pronto
+                // Inicializar quando o DOM estiver pronto
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
             init();
         }
+
+        // ===================================
+        // INSTALAÇÃO AUTOMÁTICA DO PWA
+        // ===================================
+
+        let deferredPrompt;
+        const installButton = document.createElement('button');
+
+        function criarBotaoInstalacao() {
+            installButton.innerHTML = '📱 Instalar App';
+            installButton.className = 'fixed bottom-24 right-4 bg-[--cor-ouro-acento] text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg z-50 hover:bg-amber-600 transition-colors';
+            installButton.style.display = 'none';
+            document.body.appendChild(installButton);
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA pode ser instalado!');
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.style.display = 'block';
+            
+            installButton.addEventListener('click', async () => {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('Usuário instalou o PWA');
+                    installButton.style.display = 'none';
+                }
+                
+                deferredPrompt = null;
+            });
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA instalado com sucesso!');
+            installButton.style.display = 'none';
+            deferredPrompt = null;
+        });
+
+        // Inicializar botão de instalação
+        document.addEventListener('DOMContentLoaded', criarBotaoInstalacao);
+
+        // Verificar se já está instalado como PWA
+        function verificarSeEstaInstalado() {
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('Já está rodando como PWA instalado');
+                installButton.style.display = 'none';
+            }
+        }
+        verificarSeEstaInstalado();
 
         // ===================================
         // RASTREAMENTO DE VISITAS E PEDIDOS

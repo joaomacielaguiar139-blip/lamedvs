@@ -2247,5 +2247,16 @@
             setTimeout(() => registrarVisita(pagina), 1000);
         });
     </script>
+     <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    
+    <!-- SERVICE WORKER PARA PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => console.log('Service Worker registrado com sucesso:', registration))
+                .catch(error => console.log('Falha ao registrar Service Worker:', error));
+        }
+    </script>
 </body>
 </html>

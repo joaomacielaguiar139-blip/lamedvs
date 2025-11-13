@@ -576,11 +576,11 @@
             <div class="flex items-center gap-6">
                 <button id="menu-button" class="md:hidden text-2xl z-10 text-[--cor-texto]">☰</button>
                 <nav class="hidden md:flex gap-6 text-sm font-medium">
-                    <a href="#" data-page="page-collection" class="page-link hover:text-[--cor-ouro-acento]">COLEÇÃO</a>
+                    <a href="#colecao" class="hover:text-[--cor-ouro-acento]">COLEÇÃO</a>
                 </nav>
             </div>
 
-            <a href="#" data-page="page-home" class="flex items-end page-link justify-center">
+            <a href="#home" class="flex items-end page-link justify-center">
                 <h1 class="text-6xl text-[--cor-texto] leading-none allura">Laméd</h1>
                 <span class="text-xl gold-accent serif leading-none ml-1" style="transform: translateY(-0.5rem);">vs</span>
             </a>
@@ -597,7 +597,7 @@
         </div>
         
         <nav id="mobile-menu" class="md:hidden bg-white shadow-lg border-t absolute w-full">
-            <a href="#" data-page="page-collection" class="page-link block px-4 py-3 hover:bg-gray-50">Coleção</a>
+            <a href="#colecao" class="block px-4 py-3 hover:bg-gray-50">Coleção</a>
             <a href="#contato" class="block px-4 py-3 hover:bg-gray-50">Contato</a>
         </nav>
     </header>
@@ -615,7 +615,7 @@
                 <div class="hero-content bg-white/90 p-8 md:p-12 rounded-lg shadow-2xl max-w-lg">
                     <h2 class="serif text-4xl md:text-6xl font-light mb-4 text-[--cor-texto]">Nova Coleção</h2>
                     <p class="text-base md:text-xl mb-6 tracking-widest text-gray-700">Na Terra como no Céu</p>
-                    <a href="#" data-page="page-collection" class="page-link main-button text-white font-semibold py-3 px-8 rounded-full uppercase text-sm tracking-wider">Veja nossa a Coleção</a>
+                    <a href="#colecao" class="main-button text-white font-semibold py-3 px-8 rounded-full uppercase text-sm tracking-wider">Veja nossa a Coleção</a>
                     <div class="mt-4">
                         <a href="#sobre" class="underline text-sm text-gray-600 hover:text-[--cor-ouro-acento]">Conheça Nossa História</a>
                     </div>
@@ -634,7 +634,7 @@
                         </div>
                     </div>
 
-                    <a href="#" data-page="page-collection" class="page-link main-button text-white font-semibold py-3 px-8 rounded-full uppercase text-sm tracking-wider">Ver todas as peças</a>
+                    <a href="#colecao" class="main-button text-white font-semibold py-3 px-8 rounded-full uppercase text-sm tracking-wider">Ver todas as peças</a>
                 </div>
             </section>
 
@@ -1049,7 +1049,7 @@
         let selectedSize = null;
         let selectedColor = null;
         let isTransitioning = false;
-        let productDetailOrigin = 'page-collection';
+        let productDetailOrigin = 'page-collection'; // MODIFICADO: Agora será '#colecao' ou '#home'
         let splideMain = null;
         let splideThumbnails = null;
         let homeSplide = null;
@@ -1308,15 +1308,15 @@
                 </div>
             `;
             
+            // MODIFICADO: Atualiza o hash da URL ao invés de chamar a função diretamente
             card.addEventListener('click', () => {
                 if (totalEstoque <= 0) return; // Não permite clicar se estiver esgotado
                 
-                productDetailOrigin = isPreview ? 'page-home' : 'page-collection';
-                if (isPreview) {
-                    showPageAndProduct('page-collection', peca.id);
-                } else {
-                    showProductDetail(peca.id);
-                }
+                // Define de onde o usuário veio (para o botão "Voltar")
+                productDetailOrigin = isPreview ? '#home' : '#colecao';
+                
+                // Muda a URL, o que vai disparar o 'hashchange' listener
+                window.location.hash = `#/produto/${peca.id}`;
             });
             
             return card;
@@ -1458,6 +1458,9 @@
 
                     atualizarGridProdutos();
                     popularPreviewColecao();
+
+                    // NOVO: Chamar o roteador APÓS as peças carregarem
+                    handleRouting();
                 })
                 .catch((error) => {
                     console.error("Erro ao carregar peças: ", error);
@@ -1682,6 +1685,30 @@
         // ===================================
         // CARRINHO DE COMPRAS
         // ===================================
+        
+        // NOVO: Função de Roteamento
+        function handleRouting() {
+            const hash = window.location.hash;
+            
+            // Fecha o menu mobile ao navegar
+            if (elements.mobileMenu.classList.contains('active')) {
+                elements.mobileMenu.classList.remove('active');
+                elements.menuButton.textContent = '☰';
+            }
+
+            if (hash.startsWith('#/produto/')) {
+                const productId = hash.split('/')[2];
+                // Se temos um ID de produto, mostramos a página da coleção
+                // e ativamos a visualização de detalhes
+                showPage('page-collection', true, productId);
+                
+            } else if (hash === '#colecao') {
+                showPage('page-collection');
+            } else {
+                // O padrão é a página inicial (hash vazio ou #home)
+                showPage('page-home');
+            }
+        }
 
         function loadCart() {
             cart = JSON.parse(localStorage.getItem('lamedCart')) || [];
@@ -2308,19 +2335,13 @@
             
             // Carregar dados
             loadCart();
-            carregarPecas();
+            carregarPecas(); // Esta função agora chama handleRouting() no final
 
             // Event Listeners
+            // MODIFICADO: Botão voltar agora usa o hash
             document.getElementById('back-to-gallery').addEventListener('click', () => {
-                const productDetailView = document.getElementById('product-detail-view');
-                productDetailView.classList.add('hidden');
-                currentProduct = null;
-                
-                if (productDetailOrigin === 'page-home') {
-                    showPage('page-home');
-                } else {
-                    document.getElementById('collection-gallery').classList.remove('hidden');
-                }
+                // productDetailOrigin é definido ao clicar no card
+                window.location.hash = productDetailOrigin || '#colecao';
             });
 
             // Seletor de tamanhos
@@ -2483,20 +2504,12 @@
                 elements.menuButton.textContent = elements.mobileMenu.classList.contains('active') ? '✕' : '☰';
             });
 
-            // Links de navegação
-            document.querySelectorAll('.page-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const pageId = e.currentTarget.dataset.page;
-                    if (pageId) {
-                        showPage(pageId);
-                    }
-                    if (elements.mobileMenu.classList.contains('active')) {
-                         elements.mobileMenu.classList.remove('active');
-                         elements.menuButton.textContent = '☰';
-                    }
-                });
-            });
+            // Links de navegação (REMOVIDO O LISTENER ANTIGO)
+            // O novo listener de hashchange cuida de toda a navegação
+            
+            // NOVO: Listener de Roteamento
+            // Escuta por cliques nos links (como #colecao) e mudanças programáticas
+            window.addEventListener('hashchange', handleRouting);
 
             // Animação de scroll
             if ('IntersectionObserver' in window) {
